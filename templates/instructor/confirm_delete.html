@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Category</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+    <div class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Delete "{{ what }}"?</h3>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div class="flex justify-center space-x-4">
+                <button type="submit" 
+                        class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-300">
+                    Yes, delete
+                </button>
+                <a href="{% url 'my_courses' %}" 
+                   class="inline-block bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-400 transition duration-300">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
