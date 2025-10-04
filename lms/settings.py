@@ -63,6 +63,9 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
+LOGIN_URL = "/accounts/login/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/accounts/redirect_after_login/"  # we'll create this soon
 
 # ✅ Static & media (define once)
 STATIC_URL = 'static/'

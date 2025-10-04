@@ -1,0 +1,37 @@
+<h2>Users</h2>
+
+<form method="get">
+  <input name="q" value="{{ q }}" placeholder="Search username/email">
+  <select name="role">
+    <option value="">All</option>
+    <option value="student" {% if role == 'student' %}selected{% endif %}>Students</option>
+    <option value="instructor" {% if role == 'instructor' %}selected{% endif %}>Instructors</option>
+
+    
+  </select>
+  <button>Filter</button>
+</form>
+
+<p>
+  <a href="{% url 'ap_create_student' %}">+ Add Student</a> |
+  <a href="{% url 'ap_create_instructor' %}">+ Add Instructor</a>
+</p>
+
+<table border="1" cellspacing="0" cellpadding="6">
+  <tr><th>Username</th><th>Email</th><th>Role</th><th>Actions</th></tr>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.username }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ u.role|default:"-" }}</td>
+    <td>
+      <a href="{% url 'ap_user_edit' u.pk %}">Edit</a> |
+      <a href="{% url 'ap_reset_password' u.pk %}">Reset PW</a> |
+      <a href="{% url 'ap_user_delete' u.pk %}">Delete</a>
+      {% if u.role != 'instructor' %}
+        | <a href="{% url 'ap_approve_instructor' u.pk %}">Make Instructor</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% empty %}<tr><td colspan="4">No users found.</td></tr>{% endfor %}
+</table>
