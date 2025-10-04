@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django import forms
 from django.http import HttpResponse
+from django.apps import apps   # <-- new
+
 
 
 User = get_user_model()
@@ -100,4 +102,26 @@ def approve_instructor(request, pk):
     u.save()
     messages.success(request, f"{u.username} is now an Instructor.")
     return redirect("ap_user_list")
+
+
+# ---------- Course Oversight ----------
+@staff_member_required
+def course_list(request):
+    Course = apps.get_model("courses", "Course")
+    q = request.GET.get("q", "")
+    courses = Course.objects.select_related("instructor", "category").order_by("-id")
+    if q:
+        courses = courses.filter(title__icontains=q)
+    return render(request, "adminpanel/course_list.html", {"courses": courses, "q": q})
+
+
+@staff_member_required
+def course_toggle_active(request, pk):
+    Course = apps.get_model("courses", "Course")
+    c = get_object_or_404(Course, pk=pk)
+    c.is_active = not c.is_active
+    c.save()
+    messages.info(request, f"'{c.title}' active = {c.is_active}")
+    return redirect("ap_course_list")
+
 

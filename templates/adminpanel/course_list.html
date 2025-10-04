@@ -1,0 +1,33 @@
+<h2>All Courses</h2>
+
+<form>
+  <input name="q" value="{{ q }}" placeholder="Search title">
+  <button>Search</button>
+</form>
+
+<p><a href="/courses/categories/">Manage Categories</a></p>
+
+<table border="1" cellspacing="0" cellpadding="6">
+  <tr>
+    <th>Title</th>
+    <th>Instructor</th>
+    <th>Category</th>
+    <th>Active</th>
+    <th>Actions</th>
+  </tr>
+  {% for c in courses %}
+  <tr>
+    <td>{{ c.title }}</td>
+    <td>{{ c.instructor.username }}</td>
+    <td>{{ c.category }}</td>
+    <td>{{ c.is_active }}</td>
+    <td>
+      <a href="{% url 'ap_course_toggle' c.id %}">
+        {{ c.is_active|yesno:"Deactivate,Activate" }}
+      </a>
+    </td>
+  </tr>
+  {% empty %}
+  <tr><td colspan="5">No courses.</td></tr>
+  {% endfor %}
+</table>
