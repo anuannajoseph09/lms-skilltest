@@ -17,5 +17,9 @@ urlpatterns = [
     path("courses/<int:pk>/toggle/", ap.course_toggle_active, name="ap_course_toggle"),
     path("users/<int:pk>/approve-instructor/", ap.approve_instructor, name="ap_approve_instructor"),
     path("users/<int:pk>/reject-instructor/", ap.reject_instructor,  name="ap_reject_instructor"),
+    path("categories/", ap.category_list,   name="ap_category_list"),
+    path("categories/new/", ap.category_create, name="ap_category_create"),
+    path("categories/<int:pk>/delete/", ap.category_delete, name="ap_category_delete"),
+    path("dashboard/", ap.dashboard, name="ap_dashboard"),
 
 ]

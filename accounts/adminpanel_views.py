@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django import forms
 from django.http import HttpResponse
 from django.apps import apps
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -19,6 +20,55 @@ def ping(request):
 # -------------------------------------------------
 # ✅ USER MANAGEMENT
 # -------------------------------------------------
+
+# accounts/adminpanel_views.py
+from django.db.models import Count, Avg
+
+@staff_member_required
+def dashboard(request):
+    User = apps.get_model("accounts", "User")
+    Course = apps.get_model("courses", "Course")
+
+    Enrollment = apps.get_model("enrollments", "Enrollment") if apps.is_installed("enrollments") else None
+    Quiz = apps.get_model("quizzes", "Quiz") if apps.is_installed("quizzes") else None
+    Submission = apps.get_model("quizzes", "Submission") if apps.is_installed("quizzes") else None
+
+    stats = {
+        "total_users": User.objects.count(),
+        "total_students": User.objects.filter(role="student").count(),
+        "total_instructors": User.objects.filter(role="instructor").count(),
+        "total_courses": Course.objects.count(),
+        "total_quizzes": Quiz.objects.count() if Quiz else 0,
+    }
+
+    # Determine the relation name from Enrollment to Course (defaults to "enrollment_set")
+    popular_courses = []
+    if Enrollment:
+        course_field = Enrollment._meta.get_field("course")
+        rel_name = course_field.remote_field.related_name or "enrollment_set"
+
+        # annotate using the relation name we discovered
+        popular_courses = (
+            Course.objects.annotate(enrolls=Count(rel_name))
+            .order_by("-enrolls", "-id")[:5]
+        )
+
+    top_students = []
+    if Submission:
+        top_students = (
+            Submission.objects.values("user__username")
+            .annotate(avg_score=Avg("score"), attempts=Count("id"))
+            .order_by("-avg_score")[:5]
+        )
+
+    return render(
+        request,
+        "adminpanel/dashboard.html",
+        {"stats": stats, "popular_courses": popular_courses, "top_students": top_students},
+    )
+
+
+
 @staff_member_required
 def user_list(request):
     q = request.GET.get("q", "")
@@ -28,7 +78,7 @@ def user_list(request):
     if role in ("student", "instructor"):
         users = users.filter(role=role)
     if q:
-        users = users.filter(username__icontains=q) | users.filter(email__icontains=q)
+        users = users.filter(Q(username__icontains=q) | Q(email__icontains=q))
 
     return render(request, "adminpanel/user_list.html", {"users": users, "q": q, "role": role})
 
