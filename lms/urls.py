@@ -28,4 +28,7 @@ urlpatterns = [
     path('quiz/', include('quizzes.urls')),
     path('forum/', include('forum.urls')),
     path('analytics/', include('analytics.urls')),
+    path('learning/', include('learning.urls')),
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
