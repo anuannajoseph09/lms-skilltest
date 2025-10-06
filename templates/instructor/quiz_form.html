@@ -1,0 +1,13 @@
+<h3>
+  {% if quiz %}
+    Edit Quiz: {{ quiz.title }}
+  {% else %}
+    New Quiz for {{ course.title }}
+  {% endif %}
+</h3>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button>Save</button>
+</form>

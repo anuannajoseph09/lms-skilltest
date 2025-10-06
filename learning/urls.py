@@ -1,2 +1,12 @@
 from django.urls import path
-urlpatterns = []
+from . import instructor_views as v
+
+urlpatterns = [
+    path("manage/<int:course_id>/", v.manage_lessons, name="manage_lessons"),
+    path("lesson/new/<int:course_id>/", v.lesson_create, name="lesson_create"),
+    path("lesson/<int:pk>/edit/", v.lesson_edit, name="lesson_edit"),
+    path("lesson/<int:pk>/delete/", v.lesson_delete, name="lesson_delete"),
+
+    path("material/new/<int:lesson_id>/", v.material_create, name="material_create"),
+    path("material/<int:pk>/delete/", v.material_delete, name="material_delete"),
+]
