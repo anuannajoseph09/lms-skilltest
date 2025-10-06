@@ -1,3 +1,4 @@
+# accounts/models.py
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -7,6 +8,11 @@ class User(AbstractUser):
     profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
     qualifications = models.TextField(blank=True)
 
-    def is_instructor(self): return self.role == 'instructor'
-    def is_student(self): return self.role == 'student'
+    # NEW: admin approval for instructors
+    is_instructor_approved = models.BooleanField(default=False)
 
+    def is_instructor(self):
+        return self.role == 'instructor' and self.is_instructor_approved
+
+    def is_student(self):
+        return self.role == 'student'

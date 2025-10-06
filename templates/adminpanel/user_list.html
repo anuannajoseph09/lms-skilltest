@@ -1,37 +1,116 @@
-<h2>Users</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Users</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="container mx-auto px-4 py-8">
 
-<form method="get">
-  <input name="q" value="{{ q }}" placeholder="Search username/email">
-  <select name="role">
-    <option value="">All</option>
-    <option value="student" {% if role == 'student' %}selected{% endif %}>Students</option>
-    <option value="instructor" {% if role == 'instructor' %}selected{% endif %}>Instructors</option>
+    <!-- Flash messages -->
+    {% if messages %}
+      <div class="mb-6 space-y-2">
+        {% for m in messages %}
+          <div class="px-4 py-3 rounded 
+                      {% if m.tags == 'success' %}bg-green-100 text-green-800
+                      {% elif m.tags == 'error' %}bg-red-100 text-red-800
+                      {% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ m }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-    
-  </select>
-  <button>Filter</button>
-</form>
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Users</h2>
 
-<p>
-  <a href="{% url 'ap_create_student' %}">+ Add Student</a> |
-  <a href="{% url 'ap_create_instructor' %}">+ Add Instructor</a>
-</p>
+    <!-- Filter -->
+    <form method="get" class="mb-8 flex justify-center gap-2">
+      <input
+        name="q"
+        value="{{ q }}"
+        placeholder="Search username/email"
+        class="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <select
+        name="role"
+        class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">All</option>
+        <option value="student" {% if role == 'student' %}selected{% endif %}>Students</option>
+        <option value="instructor" {% if role == 'instructor' %}selected{% endif %}>Instructors</option>
+      </select>
+      <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        Filter
+      </button>
+    </form>
 
-<table border="1" cellspacing="0" cellpadding="6">
-  <tr><th>Username</th><th>Email</th><th>Role</th><th>Actions</th></tr>
-  {% for u in users %}
-  <tr>
-    <td>{{ u.username }}</td>
-    <td>{{ u.email }}</td>
-    <td>{{ u.role|default:"-" }}</td>
-    <td>
-      <a href="{% url 'ap_user_edit' u.pk %}">Edit</a> |
-      <a href="{% url 'ap_reset_password' u.pk %}">Reset PW</a> |
-      <a href="{% url 'ap_user_delete' u.pk %}">Delete</a>
-      {% if u.role != 'instructor' %}
-        | <a href="{% url 'ap_approve_instructor' u.pk %}">Make Instructor</a>
-      {% endif %}
-    </td>
-  </tr>
-  {% empty %}<tr><td colspan="4">No users found.</td></tr>{% endfor %}
-</table>
+    <p class="text-center mb-6">
+      <a href="{% url 'ap_create_student' %}" class="text-blue-600 hover:text-blue-800 font-medium">+ Add Student</a>
+      <span class="text-gray-400 mx-2">|</span>
+      <a href="{% url 'ap_create_instructor' %}" class="text-blue-600 hover:text-blue-800 font-medium">+ Add Instructor</a>
+    </p>
+
+    <!-- Table -->
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for u in users %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ u.username }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ u.email }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ u.role|default:"-" }}
+              {% if u.role == 'instructor' %}
+                <span class="ml-2 px-2 py-0.5 text-xs rounded
+                            {% if u.is_instructor_approved %}bg-green-100 text-green-700
+                            {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                  {% if u.is_instructor_approved %}Approved{% else %}Pending{% endif %}
+                </span>
+              {% endif %}
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+              <!-- Role-specific links -->
+              {% if u.role == 'instructor' %}
+                {% if not u.is_instructor_approved %}
+                  <a href="{% url 'ap_approve_instructor' u.id %}" class="text-green-600 hover:text-green-800">Approve</a>
+                  <span class="text-gray-300">•</span>
+                  <a href="{% url 'ap_reject_instructor'  u.id %}" class="text-red-600 hover:text-red-800">Reject</a>
+                  <span class="text-gray-300">•</span>
+                {% endif %}
+              {% else %}
+                <!-- show Make Instructor for non-instructors -->
+                <a href="{% url 'ap_approve_instructor' u.id %}" class="text-green-600 hover:text-green-800">Make Instructor</a>
+                <span class="text-gray-300">•</span>
+              {% endif %}
+
+              <!-- Common links -->
+              <a href="{% url 'ap_user_edit' u.id %}" class="text-blue-600 hover:text-blue-800">Edit</a>
+              <span class="text-gray-300">•</span>
+              <a href="{% url 'ap_reset_password' u.id %}" class="text-blue-600 hover:text-blue-800">Reset PW</a>
+              <span class="text-gray-300">•</span>
+              <a href="{% url 'ap_user_delete' u.id %}" class="text-red-600 hover:text-red-800">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="px-6 py-6 text-center text-sm text-gray-500">No users found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
+

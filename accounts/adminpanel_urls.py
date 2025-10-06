@@ -15,5 +15,7 @@ urlpatterns = [
     path("users/<int:pk>/approve-instructor/", ap.approve_instructor, name="ap_approve_instructor"),
     path("courses/", ap.course_list, name="ap_course_list"),
     path("courses/<int:pk>/toggle/", ap.course_toggle_active, name="ap_course_toggle"),
+    path("users/<int:pk>/approve-instructor/", ap.approve_instructor, name="ap_approve_instructor"),
+    path("users/<int:pk>/reject-instructor/", ap.reject_instructor,  name="ap_reject_instructor"),
 
 ]
