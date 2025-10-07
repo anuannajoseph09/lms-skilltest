@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ quiz.title }} - Take Quiz</title>
+</head>
+<body>
+  <h1>{{ quiz.title }}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% for q in questions %}
+      <div style="margin-bottom:20px;">
+        <h4>{{ forloop.counter }}. {{ q.text }}</h4>
+        {% for opt in q.options.all %}
+          <label>
+            <input type="radio" name="question_{{ q.id }}" value="{{ opt.id }}">
+            {{ opt.text }}
+          </label><br>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <button type="submit">Submit Quiz</button>
+  </form>
+</body>
+</html>

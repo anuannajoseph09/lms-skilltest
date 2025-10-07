@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ quiz.title }} - Result</title>
+</head>
+<body>
+  <h2>Quiz: {{ quiz.title }}</h2>
+  {% if submission %}
+    <p>You scored: <strong>{{ submission.score }}%</strong></p>
+    <p>Submitted at: {{ submission.submitted_at }}</p>
+  {% else %}
+    <p>No submission found.</p>
+  {% endif %}
+  <a href="{% url 'courses:learn' quiz.course.id %}">← Back to Course</a>
+</body>
+</html>

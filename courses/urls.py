@@ -1,12 +1,22 @@
+# courses/urls.py
 from django.urls import path
-from . import instructor_views as v
+from . import student_views as sv
+from . import instructor_views as iv
+
+app_name = "courses"
 
 urlpatterns = [
-    path("my/", v.my_courses, name="my_courses"),
-    path("new/", v.course_create, name="course_create"),
-    path("<int:pk>/edit/", v.course_edit, name="course_edit"),
-    path("<int:pk>/delete/", v.course_delete, name="course_delete"),
+    # ---------- Student routes ----------
+    path("catalog/", sv.catalog, name="catalog"),
+    path("enroll/<int:course_id>/", sv.enroll, name="enroll"),
+    path("my/", sv.my_courses, name="my_courses"),
+    path("<int:course_id>/learn/", sv.course_learn, name="learn"),
 
-    path("categories/", v.category_list, name="category_list"),
-    path("categories/new/", v.category_create, name="category_create"),
+    # ---------- Instructor routes (names don’t collide) ----------
+    path("instructor/my/", iv.my_courses, name="instructor_my_courses"),
+    path("instructor/new/", iv.course_create, name="course_create"),
+    path("instructor/<int:pk>/edit/", iv.course_edit, name="course_edit"),
+    path("instructor/<int:pk>/delete/", iv.course_delete, name="course_delete"),
+    path("instructor/categories/", iv.category_list, name="category_list"),
+    path("instructor/categories/new/", iv.category_create, name="category_create"),
 ]
