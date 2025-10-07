@@ -1,5 +1,6 @@
 from django.db import models
 from courses.models import Course
+from django.utils import timezone
 
 class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons")
@@ -16,3 +17,14 @@ class Material(models.Model):
     type = models.CharField(max_length=10, choices=TYPES)
     file = models.FileField(upload_to="materials/")
     def __str__(self): return f"{self.lesson} [{self.type}]"
+
+class LiveSession(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="live_sessions")
+    title = models.CharField(max_length=200)
+    meet_link = models.URLField()
+    start_time = models.DateTimeField()
+    end_time   = models.DateTimeField()
+
+    def is_active(self):
+        now = timezone.now()
+        return self.start_time <= now <= self.end_time
