@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>My Courses</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+  <div class="max-w-5xl mx-auto p-6">
+    <h1 class="text-2xl font-semibold mb-4">My Courses</h1>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      {% for e in enrollments %}
+        <div class="bg-white rounded shadow p-4">
+          <h3 class="font-semibold text-lg">{{ e.course.title }}</h3>
+          <p class="text-sm text-gray-600">{{ e.course.category }}</p>
+          <p class="text-xs text-gray-500 mb-2">By {{ e.course.instructor.username }}</p>
+          <a href="{% url 'courses:learn' e.course.id %}" class="text-[#068DAA] underline">Continue →</a>
+        </div>
+      {% empty %}
+        <p>You have no enrolled courses yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

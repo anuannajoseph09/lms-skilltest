@@ -72,3 +72,5 @@ def student_change_password(request):
     view = _StudentPasswordChangeView.as_view()
     return view(request)
 
+
+

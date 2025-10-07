@@ -32,12 +32,36 @@
     <!-- Sidebar -->
     <aside class="w-64 bg-white shadow-md h-screen p-6">
       <ul class="space-y-3 font-medium">
-        <li><a href="#" class="block text-[#068DAA] hover:text-[#055b70]">🏠 Dashboard Overview</a></li>
-        <li><a href="#" class="block text-gray-700 hover:text-[#068DAA]">📘 My Courses</a></li>
-        <li><a href="#" class="block text-gray-700 hover:text-[#068DAA]">🧑‍🏫 Instructors</a></li>
-        <li><a href="#" class="block text-gray-700 hover:text-[#068DAA]">📝 Quizzes</a></li>
-        <li><a href="#" class="block text-gray-700 hover:text-[#068DAA]">💬 Discussion Forum</a></li>
-        <li><a href="#" class="block text-gray-700 hover:text-[#068DAA]">👤 Edit Profile</a></li>
+        <li>
+          <a href="{% url 'student_dashboard' %}" class="block text-[#068DAA] hover:text-[#055b70]">
+            🏠 Dashboard Overview
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'courses:my_courses' %}" class="block text-gray-700 hover:text-[#068DAA]">
+            📘 My Courses
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'courses:catalog' %}" class="block text-gray-700 hover:text-[#068DAA]">
+            🧭 Browse Catalog
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'quizzes:student_quizzes' %}" class="block text-gray-700 hover:text-[#068DAA]">
+            📝 My Quizzes
+          </a>
+        </li>
+        <li>
+          <a href="" class="block text-gray-700 hover:text-[#068DAA]">
+            💬 Discussion Forum
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'student_profile_edit' %}" class="block text-gray-700 hover:text-[#068DAA]">
+            👤 Edit Profile
+          </a>
+        </li>
       </ul>
     </aside>
 
@@ -45,108 +69,114 @@
     <main class="flex-1 p-8 overflow-y-auto">
 
       <!-- Welcome -->
-<section class="mb-8 flex items-center justify-between bg-white p-5 rounded-lg shadow">
-  <div>
-    <h2 class="text-2xl font-semibold mb-2 text-[#068DAA]">
-      Welcome back, {{ request.user.first_name|default:request.user.username }} 👋
-    </h2>
-    <p class="text-gray-600">Continue learning and track your progress here.</p>
-  </div>
+      <section class="mb-8 flex items-center justify-between bg-white p-5 rounded-lg shadow">
+        <div>
+          <h2 class="text-2xl font-semibold mb-2 text-[#068DAA]">
+            Welcome back, {{ request.user.first_name|default:request.user.username }} 👋
+          </h2>
+          <p class="text-gray-600">Continue learning and track your progress here.</p>
+        </div>
 
-  <!-- Profile photo or placeholder -->
-  <div class="flex items-center gap-4">
-    {% if request.user.profile_photo %}
-      <img
-        src="{{ request.user.profile_photo.url }}"
-        alt="Profile Photo"
-        class="w-16 h-16 rounded-full object-cover border-2 border-[#068DAA]"
-      />
-    {% else %}
-      <div
-        class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xl font-semibold border-2 border-[#068DAA]"
-      >
-        {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
-      </div>
-    {% endif %}
+        <!-- Profile Photo -->
+        <div class="flex items-center gap-4">
+          {% if request.user.profile_photo %}
+            <img
+              src="{{ request.user.profile_photo.url }}"
+              alt="Profile Photo"
+              class="w-16 h-16 rounded-full object-cover border-2 border-[#068DAA]"
+            />
+          {% else %}
+            <div
+              class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xl font-semibold border-2 border-[#068DAA]"
+            >
+              {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+            </div>
+          {% endif %}
+          <div>
+            <a href="{% url 'student_profile_edit' %}" class="text-[#068DAA] text-sm font-medium hover:underline">
+              Edit Profile →
+            </a>
+          </div>
+        </div>
+      </section>
 
-    <div>
-      <a
-        href="{% url 'student_profile_edit' %}"
-        class="text-[#068DAA] text-sm font-medium hover:underline"
-      >
-        Edit Profile →
-      </a>
-    </div>
-  </div>
-</section>
-
-
-      <!-- Course List -->
-      <section class="mb-8">
+      <!-- My Courses -->
+      <section class="mb-10">
         <h3 class="text-xl font-semibold mb-4">My Enrolled Courses</h3>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {% comment %} Replace with dynamic course list {% endcomment %}
-          <div class="bg-white p-4 rounded-lg shadow">
-            <img src="/static/images/sample-course.jpg" alt="Course" class="rounded-md mb-3">
-            <h4 class="font-bold text-lg mb-1">Python for Beginners</h4>
-            <p class="text-gray-600 text-sm mb-3">Instructor: John Doe</p>
-            <div class="bg-gray-200 rounded-full h-2 mb-2">
-              <div class="bg-[#068DAA] h-2 rounded-full" style="width: 60%"></div>
-            </div>
-            <p class="text-sm text-gray-500">Progress: 60%</p>
-          </div>
 
-          <div class="bg-white p-4 rounded-lg shadow">
-            <img src="/static/images/sample-course2.jpg" alt="Course" class="rounded-md mb-3">
-            <h4 class="font-bold text-lg mb-1">Web Development Bootcamp</h4>
-            <p class="text-gray-600 text-sm mb-3">Instructor: Jane Smith</p>
-            <div class="bg-gray-200 rounded-full h-2 mb-2">
-              <div class="bg-[#068DAA] h-2 rounded-full" style="width: 80%"></div>
-            </div>
-            <p class="text-sm text-gray-500">Progress: 80%</p>
+        {% if enrollments %}
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for e in enrollments %}
+              <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition">
+                {% if e.course.thumbnail %}
+                  <img src="{{ e.course.thumbnail.url }}" alt="Course" class="rounded-md mb-3 w-full h-40 object-cover" />
+                {% else %}
+                  <div class="h-40 bg-gray-200 rounded-md mb-3 flex items-center justify-center text-gray-500">No Image</div>
+                {% endif %}
+                <h4 class="font-bold text-lg mb-1">{{ e.course.title }}</h4>
+                <p class="text-gray-600 text-sm mb-3">Instructor: {{ e.course.instructor.username }}</p>
+
+                <div class="bg-gray-200 rounded-full h-2 mb-2">
+                  <div class="bg-[#068DAA] h-2 rounded-full" style="width: {{ e.progress|default:'0' }}%"></div>
+                </div>
+                <p class="text-sm text-gray-500">Progress: {{ e.progress|default:'0' }}%</p>
+
+                <a href="{% url 'courses:learn' e.course.id %}"
+                  class="mt-3 inline-block bg-[#068DAA] text-white px-4 py-2 rounded-md hover:bg-[#055b70] text-sm font-medium">
+                  Go to Course →
+                </a>
+              </div>
+            {% endfor %}
           </div>
-        </div>
+        {% else %}
+          <p class="text-gray-600 text-center">You haven’t enrolled in any courses yet.</p>
+          <div class="text-center mt-4">
+            <a href="{% url 'courses:catalog' %}" class="text-[#068DAA] underline">Browse Available Courses</a>
+          </div>
+        {% endif %}
       </section>
 
-      <!-- Quizzes Section -->
-      <section class="mb-8">
-        <h3 class="text-xl font-semibold mb-4">My Quizzes</h3>
-        <div class="bg-white shadow rounded-lg p-6">
-          <table class="min-w-full border border-gray-200 text-left text-sm">
-            <thead>
-              <tr class="bg-gray-100 text-gray-700">
-                <th class="py-3 px-4">Quiz Title</th>
-                <th class="py-3 px-4">Course</th>
-                <th class="py-3 px-4">Score</th>
-                <th class="py-3 px-4">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="py-3 px-4">Python Basics</td>
-                <td class="py-3 px-4">Python for Beginners</td>
-                <td class="py-3 px-4">85%</td>
-                <td class="py-3 px-4 text-green-600 font-medium">Completed</td>
-              </tr>
-              <tr>
-                <td class="py-3 px-4">HTML & CSS</td>
-                <td class="py-3 px-4">Web Development Bootcamp</td>
-                <td class="py-3 px-4">92%</td>
-                <td class="py-3 px-4 text-green-600 font-medium">Completed</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <!-- Quizzes -->
+      <section class="mb-10">
+        <h3 class="text-xl font-semibold mb-4">My Quiz Results</h3>
+        {% if submissions %}
+          <div class="bg-white shadow rounded-lg p-6 overflow-x-auto">
+            <table class="min-w-full border border-gray-200 text-left text-sm">
+              <thead>
+                <tr class="bg-gray-100 text-gray-700">
+                  <th class="py-3 px-4">Quiz Title</th>
+                  <th class="py-3 px-4">Course</th>
+                  <th class="py-3 px-4">Score</th>
+                  <th class="py-3 px-4">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in submissions %}
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-4">{{ s.quiz.title }}</td>
+                    <td class="py-3 px-4">{{ s.quiz.course.title }}</td>
+                    <td class="py-3 px-4">{{ s.score }}%</td>
+                    <td class="py-3 px-4">{{ s.submitted_at|date:"M d, Y H:i" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-gray-600 text-center">No quizzes attempted yet.</p>
+        {% endif %}
       </section>
 
-      <!-- Forum Section -->
+      <!-- Discussion Forum -->
       <section>
         <h3 class="text-xl font-semibold mb-4">Discussion Forum</h3>
         <div class="bg-white p-6 rounded-lg shadow space-y-4">
           <div class="border-b pb-3">
             <p class="font-semibold">Q: How to fix import errors in Django?</p>
             <p class="text-gray-600 text-sm mt-1">Asked by <span class="font-medium">Rahul</span> • 2h ago</p>
-            <p class="mt-2 text-gray-800">You can use `pip install` or check your virtual environment path.</p>
+            <p class="mt-2 text-gray-800">
+              You can use <code>pip install</code> or check your virtual environment path.
+            </p>
           </div>
           <div>
             <textarea
@@ -159,10 +189,8 @@
           </div>
         </div>
       </section>
-
     </main>
   </div>
 
 </body>
 </html>
-

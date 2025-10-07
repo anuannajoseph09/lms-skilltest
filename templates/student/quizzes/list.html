@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My Quizzes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <h1 class="text-2xl font-semibold mb-4">My Quizzes</h1>
+  <p class="mb-4"><a class="text-blue-600 underline" href="{% url 'student_dashboard' %}">← Back to dashboard</a></p>
+
+  {% if submissions %}
+    <div class="bg-white p-4 rounded shadow overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-3 py-2 text-left">Quiz</th>
+            <th class="px-3 py-2 text-left">Course</th>
+            <th class="px-3 py-2 text-left">Score</th>
+            <th class="px-3 py-2 text-left">Submitted</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in submissions %}
+            <tr class="border-b">
+              <td class="px-3 py-2">{{ s.quiz.title }}</td>
+              <td class="px-3 py-2">{{ s.quiz.course.title }}</td>
+              <td class="px-3 py-2">{{ s.score }}%</td>
+              <td class="px-3 py-2">{{ s.submitted_at|date:"M d, Y H:i" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-gray-600">No quiz attempts yet.</p>
+  {% endif %}
+</body>
+</html>
