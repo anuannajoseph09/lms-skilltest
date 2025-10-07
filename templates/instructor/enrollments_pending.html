@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><title>Pending Enrollments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6">
+  <h1 class="text-2xl font-semibold mb-4">Pending enrollments (my courses)</h1>
+
+  <table class="min-w-full border">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="p-2 text-left">Student</th>
+        <th class="p-2 text-left">Email</th>
+        <th class="p-2 text-left">Course</th>
+        <th class="p-2">Requested</th>
+        <th class="p-2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in enrollments %}
+      <tr class="border-t">
+        <td class="p-2">{{ e.user.get_full_name|default:e.user.username }}</td>
+        <td class="p-2">{{ e.user.email }}</td>
+        <td class="p-2">{{ e.course.title }}</td>
+        <td class="p-2">{{ e.created_at|date:"Y-m-d H:i" }}</td>
+        <td class="p-2 space-x-3">
+          <a href="{% url 'enrollments:approve' e.id %}" class="text-green-700 underline">Approve</a>
+          <a href="{% url 'enrollments:reject' e.id %}" class="text-red-700 underline">Reject</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td class="p-4 text-gray-500" colspan="5">No pending requests.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

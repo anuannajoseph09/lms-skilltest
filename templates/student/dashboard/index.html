@@ -14,7 +14,7 @@
       <h1 class="text-xl font-semibold">Student Dashboard</h1>
       <div class="flex items-center gap-4">
         <span class="font-medium">{{ request.user.username }}</span>
-        <form action="{% url 'logout' %}" method="post">
+        <form action="{% url 'accounts:logout' %}" method="post">
           {% csrf_token %}
           <button
             type="submit"
@@ -33,7 +33,7 @@
     <aside class="w-64 bg-white shadow-md h-screen p-6">
       <ul class="space-y-3 font-medium">
         <li>
-          <a href="{% url 'student_dashboard' %}" class="block text-[#068DAA] hover:text-[#055b70]">
+          <a href="{% url 'accounts:student_dashboard' %}" class="block text-[#068DAA] hover:text-[#055b70]">
             🏠 Dashboard Overview
           </a>
         </li>
@@ -58,7 +58,7 @@
           </a>
         </li>
         <li>
-          <a href="{% url 'student_profile_edit' %}" class="block text-gray-700 hover:text-[#068DAA]">
+          <a href="{% url 'accounts:student_profile_edit' %}" class="block text-gray-700 hover:text-[#068DAA]">
             👤 Edit Profile
           </a>
         </li>
@@ -93,7 +93,7 @@
             </div>
           {% endif %}
           <div>
-            <a href="{% url 'student_profile_edit' %}" class="text-[#068DAA] text-sm font-medium hover:underline">
+            <a href="{% url 'accounts:student_profile_edit' %}" class="text-[#068DAA] text-sm font-medium hover:underline">
               Edit Profile →
             </a>
           </div>

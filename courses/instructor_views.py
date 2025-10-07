@@ -115,7 +115,7 @@ def course_create(request):
         obj.instructor = request.user
         obj.save()
         messages.success(request, "Course created.")
-        return redirect("my_courses")
+        return redirect("courses:my_courses")
     return render(request, "instructor/course_form.html", {"form": form, "title": "New Course"})
 
 @login_required
@@ -126,7 +126,7 @@ def course_edit(request, pk):
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Course updated.")
-        return redirect("my_courses")
+        return redirect("courses:instructor_my_courses")
     return render(request, "instructor/course_form.html", {"form": form, "title": f"Edit: {course.title}"})
 
 @login_required
@@ -136,7 +136,7 @@ def course_delete(request, pk):
     if request.method == "POST":
         course.delete()
         messages.success(request, "Course deleted.")
-        return redirect("my_courses")
+        return redirect("courses:instructor_my_courses")
     return render(request, "instructor/confirm_delete.html", {"what": course.title})
 
 # ---- Categories (simple) ----
@@ -152,5 +152,5 @@ def category_create(request):
     form = CategoryForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         form.save(); messages.success(request, "Category added.")
-        return redirect("category_list")
+        return redirect("courses:category_list")
     return render(request, "instructor/category_form.html", {"form": form})

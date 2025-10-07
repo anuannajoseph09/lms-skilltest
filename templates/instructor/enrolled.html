@@ -1,43 +1,53 @@
-{% extends "instructor/base.html" %}
-{% block content %}
-<h3 class="mb-3">{{ course.title }} — Students</h3>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><title>Enrolled Students</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6">
+  <h1 class="text-2xl font-semibold mb-4">Enrolled – {{ course.title }}</h1>
 
-<form method="post" class="row g-2 mb-4">
-  {% csrf_token %}
-  <div class="col-md-6">
-    <input class="form-control" name="email" placeholder="student@email.com">
-  </div>
-  <div class="col-md-3">
-    <button class="btn btn-primary">Add Student</button>
-  </div>
-</form>
+  <form method="post" class="mb-6 flex gap-2">
+    {% csrf_token %}
+    <input name="email" type="email" placeholder="student@example.com"
+           class="border rounded p-2 w-80" required>
+    <button class="bg-teal-600 text-white px-4 py-2 rounded">Add Student</button>
+  </form>
 
-<table class="table table-sm align-middle">
-  <thead>
-    <tr><th>Student</th><th>Status</th><th>Progress</th><th>Last Quiz</th><th></th></tr>
-  </thead>
-  <tbody>
-    {% for e in items %}
+  <table class="min-w-full border">
+    <thead class="bg-gray-50">
       <tr>
-        <td>{{ e.user.get_full_name|default:e.user.username }} <div class="small text-muted">{{ e.user.email }}</div></td>
-        <td>{{ e.status|title }}</td>
-        <td>{{ e.progress_percent }}%</td>
-        <td>
-          {% if e.last_quiz_score is not None %}
-            {{ e.last_quiz_score }}
+        <th class="p-2 text-left">Student</th>
+        <th class="p-2 text-left">Email</th>
+        <th class="p-2">Status</th>
+        <th class="p-2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in items %}
+      <tr class="border-t">
+        <td class="p-2">{{ e.user.get_full_name|default:e.user.username }}</td>
+        <td class="p-2">{{ e.user.email }}</td>
+        <td class="p-2">{{ e.status|title }}</td>
+        <td class="p-2 text-center">
+          {% if e.status == 'pending' %}
+            <a href="{% url 'enrollments:approve_enrollment' e.id %}"
+               class="text-teal-700 underline">Approve</a>
           {% else %}
             —
           {% endif %}
         </td>
-        <td>
-          {% if e.status != 'approved' %}
-            <a class="btn btn-sm btn-success" href="{% url 'enrollments:approve_enrollment' e.id %}">Approve</a>
-          {% endif %}
-        </td>
       </tr>
-    {% empty %}
-      <tr><td colspan="5">No enrollments yet.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% endblock %}
+      {% empty %}
+      <tr><td class="p-4 text-gray-500" colspan="4">No enrollments yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="mt-4">
+    <a href="{% url 'enrollments:pending' %}" class="text-teal-700 underline">
+      View all pending requests →
+    </a>
+  </p>
+</body>
+</html>

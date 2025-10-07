@@ -25,7 +25,7 @@ def quiz_create(request, course_id):
     form = QuizForm(request.POST or None)
     if request.method=="POST" and form.is_valid():
         q = form.save(commit=False); q.course=c; q.save()
-        messages.success(request,"Quiz created."); return redirect("quiz_manage", course_id=c.id)
+        messages.success(request,"Quiz created."); return redirect("quizzes:quiz_manage", course_id=c.id)
     return render(request,"instructor/quiz_form.html",{"form":form,"course":c})
 
 @login_required
@@ -34,7 +34,7 @@ def question_create(request, quiz_id):
     form = QuestionForm(request.POST or None)
     if request.method=="POST" and form.is_valid():
         obj = form.save(commit=False); obj.quiz=quiz; obj.save()
-        messages.success(request,"Question added."); return redirect("quiz_manage", course_id=quiz.course.id)
+        messages.success(request,"Question added."); return redirect("quizzes:quiz_manage", course_id=quiz.course.id)
     return render(request,"instructor/question_form.html",{"form":form,"quiz":quiz})
 
 @login_required
@@ -43,7 +43,7 @@ def option_create(request, q_id):
     form = OptionForm(request.POST or None)
     if request.method=="POST" and form.is_valid():
         op = form.save(commit=False); op.question=question; op.save()
-        messages.success(request,"Option added."); return redirect("quiz_manage", course_id=question.quiz.course.id)
+        messages.success(request,"Option added."); return redirect("quizzes:quiz_manage", course_id=question.quiz.course.id)
     return render(request,"instructor/option_form.html",{"form":form,"question":question})
 
 # ====== QUIZ EDIT / DELETE ======
@@ -55,7 +55,7 @@ def quiz_edit(request, quiz_id):
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Quiz updated.")
-        return redirect("quiz_manage", course_id=quiz.course.id)
+        return redirect("quizzes:quiz_manage", course_id=quiz.course.id)
     return render(request, "instructor/quiz_form.html", {"form": form, "quiz": quiz, "course": quiz.course})
 
 @login_required
@@ -64,7 +64,7 @@ def quiz_delete(request, quiz_id):
     if request.method == "POST":
         quiz.delete()
         messages.success(request, "Quiz deleted.")
-        return redirect("quiz_manage", course_id=quiz.course.id)
+        return redirect("quizzes:quiz_manage", course_id=quiz.course.id)
     return render(request, "instructor/confirm_delete.html", {"what": f"quiz '{quiz.title}'"})
 
 # ====== QUESTION EDIT / DELETE ======
@@ -76,7 +76,7 @@ def question_edit(request, q_id):
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Question updated.")
-        return redirect("quiz_manage", course_id=question.quiz.course.id)
+        return redirect("quizzes:quiz_manage", course_id=question.quiz.course.id)
     return render(request, "instructor/question_form.html", {"form": form, "quiz": question.quiz})
 
 @login_required
@@ -86,7 +86,7 @@ def question_delete(request, q_id):
         cid = question.quiz.course.id
         question.delete()
         messages.success(request, "Question deleted.")
-        return redirect("quiz_manage", course_id=cid)
+        return redirect("quizzes:quiz_manage", course_id=cid)
     return render(request, "instructor/confirm_delete.html", {"what": f"question '{question.text[:40]}...'"})
 
 # ====== OPTION EDIT / DELETE ======
@@ -98,7 +98,7 @@ def option_edit(request, op_id):
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Option updated.")
-        return redirect("quiz_manage", course_id=option.question.quiz.course.id)
+        return redirect("quizzes:quiz_manage", course_id=option.question.quiz.course.id)
     return render(request, "instructor/option_form.html", {"form": form, "question": option.question})
 
 @login_required
@@ -108,6 +108,6 @@ def option_delete(request, op_id):
         cid = option.question.quiz.course.id
         option.delete()
         messages.success(request, "Option deleted.")
-        return redirect("quiz_manage", course_id=cid)
+        return redirect("quizzes:quiz_manage", course_id=cid)
     return render(request, "instructor/confirm_delete.html", {"what": f"option '{option.text[:40]}...'"})
 

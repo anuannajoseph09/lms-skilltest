@@ -14,8 +14,8 @@ def redirect_after_login(request):
     if user.is_superuser or user.is_staff:
         return redirect(reverse("ap_dashboard"))
     elif user.role == "instructor":
-        return redirect("/courses/my/")  # keep if this URL exists
+        return redirect("courses:instructor-dashboard")  # keep if this URL exists
     elif user.role == "student":
-        return redirect(reverse("student_dashboard"))  # ✅ name, not hardcoded
+        return redirect(reverse("accounts:student_dashboard"))  # ✅ name, not hardcoded
     else:
         return redirect("/")  # fallback
