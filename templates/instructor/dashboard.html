@@ -1,0 +1,137 @@
+{% extends "instructor/base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="fw-bold">Instructor Dashboard</h3>
+  <a href="{% url 'course_create' %}" class="btn btn-primary">+ New Course</a>
+</div>
+
+<!-- KPI Stats -->
+<div class="row g-3">
+  <div class="col-md-3">
+    <div class="card text-center p-3 shadow-sm">
+      <h6 class="text-muted">Courses</h6>
+      <h4>{{ kpi.total_courses }}</h4>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center p-3 shadow-sm">
+      <h6 class="text-muted">Lessons</h6>
+      <h4>{{ kpi.total_lessons }}</h4>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center p-3 shadow-sm">
+      <h6 class="text-muted">Quizzes</h6>
+      <h4>{{ kpi.total_quizzes }}</h4>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-center p-3 shadow-sm">
+      <h6 class="text-muted">Students</h6>
+      <h4>{{ kpi.total_students }}</h4>
+    </div>
+  </div>
+</div>
+
+<!-- Courses Section -->
+<h5 class="mt-5 mb-3 fw-semibold">My Courses</h5>
+{% if courses %}
+  <div class="row g-3">
+    {% for c in courses %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ c.title }}</h5>
+            <p class="card-text small text-muted">
+              Lessons: {{ c.lessons_count }} | Quizzes: {{ c.quizzes_count }}
+            </p>
+            <p class="card-text small">Approved: {{ c.students_approved }} | Pending: {{ c.students_pending }}</p>
+            <div class="mt-2 d-flex flex-wrap gap-2">
+              <a href="#" class="btn btn-outline-primary btn-sm">Students</a>
+              <a href="{% url 'manage_lessons' c.id %}" class="btn btn-outline-success btn-sm">Lessons</a>
+              <a href="{% url 'quiz_manage' c.id %}" class="btn btn-outline-secondary btn-sm">Quizzes</a>
+              <a href="{% url 'live_list' c.id %}" class="btn btn-outline-dark btn-sm">Live</a>
+              <a href="{% url 'course_edit' c.id %}" class="btn btn-outline-warning btn-sm">Edit</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info mt-3">No courses yet. <a href="{% url 'course_create' %}">Create one now</a>.</div>
+{% endif %}
+
+<!-- Recent Activities -->
+<h5 class="mt-5 mb-3 fw-semibold">Recent Activity</h5>
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Recent Enrollments</div>
+      <ul class="list-group list-group-flush">
+        {% for e in recent_enrolls %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ e.user.username }} - {{ e.course.title }}</span>
+            {% if e.status != 'approved' %}
+              <a href="{% url 'approve_enrollment' e.id %}" class="btn btn-sm btn-success">Approve</a>
+            {% endif %}
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No new enrollments</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Upcoming Live Sessions</div>
+      <ul class="list-group list-group-flush">
+        {% for s in upcoming_live %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ s.title }} ({{ s.course.title }})</span>
+            <a href="{{ s.meet_link }}" target="_blank" class="btn btn-sm btn-outline-primary">Join</a>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No live sessions scheduled</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-4">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Forum Threads</div>
+      <ul class="list-group list-group-flush">
+        {% for t in recent_threads %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ t.title|truncatechars:40 }}</span>
+            <a href="{% url 'forum_threads' t.course.id %}" class="btn btn-sm btn-outline-secondary">Open</a>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No new forum threads</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white fw-semibold">Latest Quiz Submissions</div>
+      <ul class="list-group list-group-flush">
+        {% for s in latest_results %}
+          <li class="list-group-item">
+            {{ s.user.username }} — {{ s.quiz.title }} ({{ s.score }}%)
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">No recent quiz submissions</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

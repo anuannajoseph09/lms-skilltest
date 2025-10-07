@@ -1,2 +1,26 @@
-<h2>New Category</h2>
-<form method="post">{% csrf_token %} {{ form.as_p }} <button>Save</button></form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Category</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">New Category</h2>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700">Category Name</label>
+                <input type="text" name="name" id="name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Enter category name">
+            </div>
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea name="description" id="description" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Describe the category"></textarea>
+            </div>
+            <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
+        </form>
+    </div>
+</body>
+</html>

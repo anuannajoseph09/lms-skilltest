@@ -1,0 +1,9 @@
+{% extends "instructor/base.html" %}
+{% block content %}
+<h3>Reply</h3>
+<form method="post" class="card p-3">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn btn-primary">Post Reply</button>
+</form>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "instructor/base.html" %}
+{% block content %}
+<h3 class="mb-3">{{ course.title }} — Students</h3>
+
+<form method="post" class="row g-2 mb-4">
+  {% csrf_token %}
+  <div class="col-md-6">
+    <input class="form-control" name="email" placeholder="student@email.com">
+  </div>
+  <div class="col-md-3">
+    <button class="btn btn-primary">Add Student</button>
+  </div>
+</form>
+
+<table class="table table-sm align-middle">
+  <thead>
+    <tr><th>Student</th><th>Status</th><th>Progress</th><th>Last Quiz</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for e in items %}
+      <tr>
+        <td>{{ e.user.get_full_name|default:e.user.username }} <div class="small text-muted">{{ e.user.email }}</div></td>
+        <td>{{ e.status|title }}</td>
+        <td>{{ e.progress_percent }}%</td>
+        <td>
+          {% if e.last_quiz_score is not None %}
+            {{ e.last_quiz_score }}
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>
+          {% if e.status != 'approved' %}
+            <a class="btn btn-sm btn-success" href="{% url 'enrollments:approve_enrollment' e.id %}">Approve</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5">No enrollments yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

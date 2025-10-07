@@ -1,0 +1,23 @@
+{% extends "instructor/base.html" %}
+{% block content %}
+<h3>Forum — {{ course.title }}</h3>
+{% for t in threads %}
+  <div class="card mb-2">
+    <div class="card-body">
+      <div class="fw-semibold">{{ t.title }}</div>
+      <div class="text-muted small">by {{ t.author.username }} · {{ t.created_at|date:"M d, Y H:i" }}</div>
+      <p class="mt-2">{{ t.body }}</p>
+      <div class="mt-2">
+        {% for r in t.replies.all %}
+          <div class="border rounded p-2 mb-2 bg-light"><b>{{ r.author.username }}:</b> {{ r.body }}</div>
+        {% empty %}
+          <div class="text-muted">No replies yet.</div>
+        {% endfor %}
+      </div>
+      <a class="btn btn-sm btn-outline-primary" href="{% url 'forum_reply' t.id %}">Reply</a>
+    </div>
+  </div>
+{% empty %}
+  <div class="alert alert-info">No threads yet.</div>
+{% endfor %}
+{% endblock %}

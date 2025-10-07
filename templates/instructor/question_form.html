@@ -1,13 +1,48 @@
-<h3>
-  {% if quiz %}
-    Edit Quiz: {{ quiz.title }}
-  {% else %}
-    New Quiz for {{ course.title }}
-  {% endif %}
-</h3>
-
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button>Save</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% if quiz %}
+            Edit Quiz: {{ quiz.title }} — Question
+        {% else %}
+            New Question for {{ course.title }}
+        {% endif %}
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+            {% if quiz %}
+                Edit Quiz: {{ quiz.title }} — Question
+            {% else %}
+                New Question for {{ course.title }}
+            {% endif %}
+        </h3>
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            <div>
+                <label for="id_text" class="block text-sm font-medium text-gray-700">Question Text</label>
+                <textarea name="text" id="id_text" rows="4" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Enter question text" required>{{ form.text.value|default:'' }}</textarea>
+                {% if form.text.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.text.errors|first }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label for="id_type" class="block text-sm font-medium text-gray-700">Question Type</label>
+                <select name="type" id="id_type" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                    <option value="MCQ" {% if form.type.value == 'MCQ' %}selected{% endif %}>Multiple Choice</option>
+                    <option value="TF" {% if form.type.value == 'TF' %}selected{% endif %}>True/False</option>
+                    <option value="SHORT" {% if form.type.value == 'SHORT' %}selected{% endif %}>Short Answer</option>
+                </select>
+                {% if form.type.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.type.errors|first }}</p>
+                {% endif %}
+            </div>
+            <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
+        </form>
+    </div>
+</body>
+</html>

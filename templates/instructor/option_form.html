@@ -4,59 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        {% if quiz %}
-            Edit Quiz: {{ quiz.title }}
+        {% if question %}
+            Edit Option for {{ question.text|truncatechars:30 }}
         {% else %}
-            New Quiz for {{ course.title }}
+            New Option for {{ quiz.title }}
         {% endif %}
     </title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
-        <h3 class="text-2xl font-bold text-gray-800 mb-6">
-            {% if quiz %}
-                Edit Quiz: {{ quiz.title }}
+    <div class="max-w-md w-full mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">
+            {% if question %}
+                Edit Option for {{ question.text|truncatechars:30 }}
             {% else %}
-                New Quiz for {{ course.title }}
+                New Option for {{ quiz.title }}
             {% endif %}
         </h3>
         <form method="post" class="space-y-6">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Save</button>
+            <div>
+                <label for="id_text" class="block text-sm font-medium text-gray-700">Option Text</label>
+                <input type="text" name="text" id="id_text" value="{{ form.text.value|default:'' }}" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Enter option text" required>
+                {% if form.text.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.text.errors|first }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label for="id_is_correct" class="block text-sm font-medium text-gray-700">Is Correct</label>
+                <select name="is_correct" id="id_is_correct" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="True" {% if form.is_correct.value|default:"False" == "True" %}selected{% endif %}>Yes</option>
+                    <option value="False" {% if form.is_correct.value|default:"False" == "False" %}selected{% endif %}>No</option>
+                </select>
+                {% if form.is_correct.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.is_correct.errors|first }}</p>
+                {% endif %}
+            </div>
+            <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
         </form>
     </div>
-    <style>
-        form p {
-            margin-bottom: 1rem;
-        }
-        form p label {
-            display: block;
-            font-size: 1rem;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
-        form p input,
-        form p textarea,
-        form p select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #d1d5db;
-            border-radius: 0.375rem;
-            font-size: 1rem;
-            color: #1f2937;
-            background-color: #f9fafb;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        form p input:focus,
-        form p textarea:focus,
-        form p select:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-    </style>
 </body>
 </html>
