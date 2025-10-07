@@ -1,6 +1,8 @@
+# accounts/views.py
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse  # ✅ use named URLs
 
 def ping(request):
     return HttpResponse("accounts ok")
@@ -10,11 +12,10 @@ def redirect_after_login(request):
     """Redirect users to their respective dashboards based on role."""
     user = request.user
     if user.is_superuser or user.is_staff:
-        return redirect("/adminpanel/users/")
+        return redirect(reverse("ap_dashboard"))
     elif user.role == "instructor":
-        return redirect("/courses/my/")
+        return redirect("/courses/my/")  # keep if this URL exists
     elif user.role == "student":
-        return redirect("/student/dashboard/")
+        return redirect(reverse("student_dashboard"))  # ✅ name, not hardcoded
     else:
         return redirect("/")  # fallback
-

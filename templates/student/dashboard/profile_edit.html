@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Profile | LMS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-lg shadow">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold text-[#068DAA]">Edit Profile</h1>
+      <a href="{% url 'student_dashboard' %}" class="text-[#068DAA] hover:underline">← Back to Dashboard</a>
+    </div>
+
+    {% if messages %}
+      <div class="space-y-2 mb-4">
+        {% for m in messages %}
+          <div class="px-3 py-2 rounded
+            {% if m.tags == 'success' %}bg-green-100 text-green-700
+            {% elif m.tags == 'error' %}bg-red-100 text-red-700
+            {% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ m }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% csrf_token %}
+
+      <!-- current photo -->
+      <div class="md:col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Current Photo</label>
+        <div class="flex flex-col items-center">
+          {% if user_obj.profile_photo %}
+            <img src="{{ user_obj.profile_photo.url }}" alt="Profile Photo"
+                 class="w-28 h-28 rounded-full object-cover border-2 border-[#068DAA]" />
+            <label class="mt-3 inline-flex items-center gap-2 text-sm">
+              <input type="checkbox" name="remove_photo" class="h-4 w-4">
+              Remove photo
+            </label>
+          {% else %}
+            <div class="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center
+                        text-gray-600 text-2xl font-semibold border-2 border-[#068DAA]">
+              {{ user_obj.first_name|default:user_obj.username|slice:":1"|upper }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- fields -->
+      <div class="md:col-span-2 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+          <input type="text" name="first_name" value="{{ user_obj.first_name }}" class="border rounded p-2 w-full">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+          <input type="text" name="last_name" value="{{ user_obj.last_name }}" class="border rounded p-2 w-full">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" name="email" value="{{ user_obj.email }}" class="border rounded p-2 w-full">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Upload New Photo</label>
+          <input type="file" name="profile_photo" accept="image/*" class="border rounded p-2 w-full">
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+          <button type="submit" class="bg-[#068DAA] text-white px-5 py-2 rounded hover:bg-[#055b70]">Save Changes</button>
+          <a href="{% url 'student_change_password' %}" class="text-[#068DAA] hover:underline">Change Password</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>
