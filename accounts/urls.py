@@ -5,6 +5,8 @@ from . import views
 from . import instructor_views as ac
 from . import student_views as sv
 
+app_name="accounts"
+
 urlpatterns = [
     path("ping/", views.ping, name="accounts_ping"),
 

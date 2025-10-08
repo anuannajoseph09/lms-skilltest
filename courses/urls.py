@@ -13,6 +13,7 @@ urlpatterns = [
     path("<int:course_id>/learn/", sv.course_learn, name="learn"),
 
     # ---------- Instructor routes (names don’t collide) ----------
+    path("dashboard/", iv.dashboard, name="instructor-dashboard"),
     path("instructor/my/", iv.my_courses, name="instructor_my_courses"),
     path("instructor/new/", iv.course_create, name="course_create"),
     path("instructor/<int:pk>/edit/", iv.course_edit, name="course_edit"),

@@ -110,7 +110,7 @@
 </head>
 <body>
   <!-- ✅ Post to the named login url and include CSRF -->
-  <form method="post" action="{% url 'login' %}">
+  <form method="post" action="{% url 'accounts:login' %}">
     {% csrf_token %}
     <h2>Login to LMS</h2>
 
@@ -129,7 +129,7 @@
     </div>
 
     <!-- ✅ send them through the redirect router after login -->
-    <input type="hidden" name="next" value="{% url 'redirect_after_login' %}">
+    <input type="hidden" name="next" value="{% url 'accounts:redirect_after_login' %}">
     <button type="submit">Login</button>
 
     <p><a href="/" class="home-link">Back to Home</a></p>

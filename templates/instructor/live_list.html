@@ -1,7 +1,7 @@
 {% extends "instructor/base.html" %}
 {% block content %}
 <h3>Live classes — {{ course.title }}</h3>
-<a class="btn btn-primary mb-3" href="{% url 'live_create' course.id %}">+ New live</a>
+<a class="btn btn-primary mb-3" href="{% url 'learning:live_create' course.id %}">+ New live</a>
 <table class="table table-sm">
   <thead><tr><th>Title</th><th>Window</th><th>Link</th><th></th></tr></thead>
   <tbody>
@@ -10,7 +10,7 @@
         <td>{{ s.title }}</td>
         <td>{{ s.start_time }} → {{ s.end_time }}</td>
         <td><a href="{{ s.meet_link }}" target="_blank">Join</a></td>
-        <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'live_edit' s.id %}">Edit</a></td>
+        <td><a class="btn btn-sm btn-outline-secondary" href="{% url 'learning:live_edit' s.id %}">Edit</a></td>
       </tr>
     {% empty %}
       <tr><td colspan="4">No sessions yet.</td></tr>

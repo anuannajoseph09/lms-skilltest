@@ -24,7 +24,7 @@ def lesson_create(request, course_id):
     if request.method == "POST" and form.is_valid():
         obj = form.save(commit=False); obj.course=course; obj.save()
         messages.success(request,"Lesson added.")
-        return redirect("manage_lessons", course_id=course.id)
+        return redirect("learning:manage_lessons", course_id=course.id)
     return render(request,"instructor/lesson_form.html",{"form":form,"course":course})
 
 @login_required
@@ -33,7 +33,7 @@ def lesson_edit(request, pk):
     form = LessonForm(request.POST or None, instance=l)
     if request.method == "POST" and form.is_valid():
         form.save(); messages.success(request,"Lesson updated.")
-        return redirect("manage_lessons", course_id=l.course.id)
+        return redirect("learning:manage_lessons", course_id=l.course.id)
     return render(request,"instructor/lesson_form.html",{"form":form,"course":l.course})
 
 @login_required
@@ -41,7 +41,7 @@ def lesson_delete(request, pk):
     l = get_object_or_404(Lesson, pk=pk, course__instructor=request.user)
     if request.method=="POST":
         cid=l.course.id; l.delete(); messages.success(request,"Lesson deleted.")
-        return redirect("manage_lessons", course_id=cid)
+        return redirect("learning:manage_lessons", course_id=cid)
     return render(request,"instructor/confirm_delete.html",{"what":l.title})
 
 @login_required
@@ -51,7 +51,7 @@ def material_create(request, lesson_id):
     if request.method=="POST" and form.is_valid():
         m = form.save(commit=False); m.lesson=l; m.save()
         messages.success(request,"Material uploaded.")
-        return redirect("manage_lessons", course_id=l.course.id)
+        return redirect("learning:manage_lessons", course_id=l.course.id)
     return render(request,"instructor/material_form.html",{"form":form,"lesson":l})
 
 @login_required
@@ -59,5 +59,5 @@ def material_delete(request, pk):
     m = get_object_or_404(Material, pk=pk, lesson__course__instructor=request.user)
     if request.method=="POST":
         cid=m.lesson.course.id; m.delete(); messages.success(request,"Material deleted.")
-        return redirect("manage_lessons", course_id=cid)
+        return redirect("learning:manage_lessons", course_id=cid)
     return render(request,"instructor/confirm_delete.html",{"what":str(m)})

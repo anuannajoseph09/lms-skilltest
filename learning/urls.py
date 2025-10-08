@@ -2,6 +2,8 @@ from django.urls import path
 from . import instructor_views as v
 from . import live_views as lv
 
+app_name = "learning"
+
 urlpatterns = [
     path("manage/<int:course_id>/", v.manage_lessons, name="manage_lessons"),
     path("lesson/new/<int:course_id>/", v.lesson_create, name="lesson_create"),

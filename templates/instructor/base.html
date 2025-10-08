@@ -15,6 +15,10 @@
         top:0; bottom:0; left:0;
         padding:20px 15px;
       }
+      .sidebar h4 {
+        font-weight:700;
+        font-size:1.25rem;
+      }
       .sidebar a {
         display:block;
         color:#d1d5db;
@@ -22,24 +26,59 @@
         margin:8px 0;
         padding:8px 10px;
         border-radius:8px;
+        font-weight:500;
       }
       .sidebar a.active, .sidebar a:hover {
         background:#87b6b3;
         color:#fff;
       }
-      .content { margin-left:270px; padding:25px; }
+      .content {
+        margin-left:270px;
+        padding:25px;
+      }
+      .logout-btn {
+        color:#f8d7da !important;
+      }
+      .logout-btn:hover {
+        background:#b52d3a;
+        color:#fff !important;
+      }
     </style>
   </head>
   <body>
+    <!-- Sidebar -->
     <div class="sidebar">
-      <h4 class="fw-bold text-white mb-4">Instructor</h4>
-      <a href="{% url 'instructor-dashboard' %}" class="{% if request.resolver_match.url_name == 'instructor-dashboard' %}active{% endif %}">🏠 Dashboard</a>
-      <a href="{% url 'my_courses' %}">📚 My Courses</a>
-      <a href="{% url 'course_create' %}">➕ Create Course</a>
-      <a href="{% url 'instructor_profile' %}">👤 Profile</a>
-      <a href="{% url 'logout' %}">🚪 Logout</a>
+      <h4 class="text-white mb-4">Instructor</h4>
+
+      <!-- Dashboard -->
+      <a href="{% url 'courses:instructor-dashboard' %}"
+         class="{% if request.resolver_match.url_name == 'instructor-dashboard' %}active{% endif %}">
+         🏠 Dashboard
+      </a>
+
+      <!-- My Courses -->
+      <a href="{% url 'courses:instructor_my_courses' %}"
+         class="{% if request.resolver_match.url_name == 'instructor_my_courses' %}active{% endif %}">
+         📚 My Courses
+      </a>
+
+      <!-- Create Course -->
+      <a href="{% url 'courses:course_create' %}"
+         class="{% if request.resolver_match.url_name == 'course_create' %}active{% endif %}">
+         ➕ Create Course
+      </a>
+
+      <!-- Profile -->
+      <a href="{% url 'accounts:instructor_profile' %}"
+         class="{% if request.resolver_match.url_name == 'instructor_profile' %}active{% endif %}">
+         👤 Profile
+      </a>
+
+      <!-- Logout -->
+      <a href="{% url 'accounts:logout' %}" class="logout-btn">🚪 Logout</a>
     </div>
 
+    <!-- Main Content -->
     <div class="content">
       {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">

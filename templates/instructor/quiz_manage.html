@@ -10,7 +10,7 @@
     <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">{{ course.title }} — Quizzes</h2>
         <div class="mb-6 flex space-x-4">
-            <a href="{% url 'quiz_create' course.id %}" class="inline-block bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition duration-300">
+            <a href="{% url 'quizzes:quiz_create' course.id %}" class="inline-block bg-green-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-green-700 transition duration-300">
                 + New Quiz
             </a>
             <a href="/courses/my/" class="inline-block bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300">
@@ -23,8 +23,8 @@
                     <div class="flex items-center justify-between">
                         <span class="text-lg font-semibold text-gray-700">{{ qz.title }}</span>
                         <div class="space-x-2">
-                            <a href="{% url 'quiz_edit' qz.id %}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
-                            <a href="{% url 'quiz_delete' qz.id %}" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                            <a href="{% url 'quizzes:quiz_edit' qz.id %}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
+                            <a href="{% url 'quizzes:quiz_delete' qz.id %}" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
                         </div>
                     </div>
                     <ul class="ml-6 mt-4 space-y-4">
@@ -33,8 +33,8 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-gray-600">{{ q.type }} — {{ q.text|truncatechars:50 }}</span>
                                     <div class="space-x-2">
-                                        <a href="{% url 'question_edit' q.id %}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
-                                        <a href="{% url 'question_delete' q.id %}" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                                        <a href="{% url 'quizzes:question_edit' q.id %}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
+                                        <a href="{% url 'quizzes:question_delete' q.id %}" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
                                     </div>
                                 </div>
                                 <ul class="ml-6 mt-2 space-y-2">
@@ -44,15 +44,15 @@
                                                 {{ o.text|truncatechars:30 }} {% if o.is_correct %}<span class="text-green-600">(✔)</span>{% endif %}
                                             </span>
                                             <div class="space-x-2">
-                                                <a href="{% url 'option_edit' o.id %}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
-                                                <a href="{% url 'option_delete' o.id %}" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                                                <a href="{% url 'quizzes:option_edit' o.id %}" class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
+                                                <a href="{% url 'quizzes:option_delete' o.id %}" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
                                             </div>
                                         </li>
                                     {% empty %}
                                         <li class="text-gray-500">No options</li>
                                     {% endfor %}
                                 </ul>
-                                <a href="{% url 'option_create' q.id %}" class="inline-block mt-2 text-sm bg-blue-600 text-white font-semibold py-1 px-3 rounded-md hover:bg-blue-700 transition duration-300">
+                                <a href="{% url 'quizzes:option_create' q.id %}" class="inline-block mt-2 text-sm bg-blue-600 text-white font-semibold py-1 px-3 rounded-md hover:bg-blue-700 transition duration-300">
                                     + Add Option
                                 </a>
                             </li>
@@ -60,7 +60,7 @@
                             <li class="text-gray-500">No questions</li>
                         {% endfor %}
                     </ul>
-                    <a href="{% url 'question_create' qz.id %}" class="inline-block mt-3 text-sm bg-blue-600 text-white font-semibold py-1 px-3 rounded-md hover:bg-blue-700 transition duration-300">
+                    <a href="{% url 'quizzes:question_create' qz.id %}" class="inline-block mt-3 text-sm bg-blue-600 text-white font-semibold py-1 px-3 rounded-md hover:bg-blue-700 transition duration-300">
                         + Add Question
                     </a>
                 </li>
