@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ course.title }} — Student Detail</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+  <h1 class="h4 mb-2">{{ course.title }} — Student Progress</h1>
+  <div class="mb-4">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700"
+    onclick="(function(){
+      try {
+        var r = document.referrer;
+        if (r && new URL(r).origin === location.origin) { history.back(); }
+        else { location.href = '{% url 'courses:instructor_dashboard' %}'; }
+      } catch(e) {
+        location.href = '{% url 'courses:instructor_dashboard' %}';
+      }
+    })()"
+  >
+    ← Back
+  </button>
+
+  <noscript>
+    <a href="{% url 'courses:instructor_dashboard' %}"
+       class="inline-block ml-2 text-blue-600 hover:text-blue-800 underline">
+      Back
+    </a>
+  </noscript>
+</div>
+
+  <p class="text-muted mb-4">
+    Student ID: {{ student_id }} • Progress: {{ progress_pct }}%
+  </p>
+
+  <h2 class="h6">Lessons</h2>
+  <ul class="list-group mb-4">
+    {% for L in lessons %}
+      <li class="list-group-item d-flex justify-content-between">
+        <div>
+          <strong>{{ L.order }}. {{ L.title }}</strong>
+          {% if L.description %}<div class="small text-muted">{{ L.description }}</div>{% endif %}
+        </div>
+        <div>
+          {% if L.id in done_ids %}
+            <span class="badge text-bg-success">Completed</span>
+          {% else %}
+            <span class="badge text-bg-secondary">Pending</span>
+          {% endif %}
+        </div>
+      </li>
+    {% empty %}
+      <li class="list-group-item text-muted">No lessons yet.</li>
+    {% endfor %}
+  </ul>
+
+  <h2 class="h6">Quiz Submissions</h2>
+  <div class="table-responsive mb-4">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Quiz</th>
+          <th>Score</th>
+          <th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in submissions %}
+          <tr>
+            <td>{{ s.quiz.title }}</td>
+            <td>{{ s.score }}%</td>
+            <td>{{ s.submitted_at|date:"Y-m-d H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="3" class="text-muted">No attempts yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <a href="{% url 'courses:course_students' course.id %}">← Back to students</a>
+
+</body>
+</html>

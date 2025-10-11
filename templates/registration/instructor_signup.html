@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% load widget_tweaks %}
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Register as Instructor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow p-8 w-full max-w-lg">
+    <h1 class="text-2xl font-semibold mb-6">Register as Instructor</h1>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div>
+        <label class="block text-sm font-medium">Username</label>
+        {{ form.username|add_class:"border rounded w-full p-2" }}
+        {{ form.username.errors }}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Email</label>
+        {{ form.email|add_class:"border rounded w-full p-2" }}
+        {{ form.email.errors }}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Profile Photo</label>
+        {{ form.profile_photo }}
+        {{ form.profile_photo.errors }}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Qualifications</label>
+        {{ form.qualifications|add_class:"border rounded w-full p-2" }}
+        {{ form.qualifications.errors }}
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Password</label>
+          {{ form.password1|add_class:"border rounded w-full p-2" }}
+          {{ form.password1.errors }}
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Confirm Password</label>
+          {{ form.password2|add_class:"border rounded w-full p-2" }}
+          {{ form.password2.errors }}
+        </div>
+      </div>
+
+      <button class="bg-[#068DAA] text-white px-4 py-2 rounded hover:opacity-90">Create Account</button>
+      <a href="{% url 'accounts:signup_choice' %}" class="ml-3 text-sm text-gray-600 underline">Back</a>
+    </form>
+  </div>
+</body>
+</html>
+

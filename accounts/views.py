@@ -1,21 +1,39 @@
-# accounts/views.py
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse  # ✅ use named URLs
 
 def ping(request):
     return HttpResponse("accounts ok")
 
+def signup_choice(request):
+    return render(request, "registration/signup_choice.html")
+
 @login_required
 def redirect_after_login(request):
-    """Redirect users to their respective dashboards based on role."""
-    user = request.user
-    if user.is_superuser or user.is_staff:
-        return redirect(reverse("ap_dashboard"))
-    elif user.role == "instructor":
-        return redirect("courses:instructor-dashboard")  # keep if this URL exists
-    elif user.role == "student":
-        return redirect(reverse("accounts:student_dashboard"))  # ✅ name, not hardcoded
-    else:
-        return redirect("/")  # fallback
+    u = request.user
+
+    # Admin / Superuser
+    if u.is_superuser or u.is_staff:
+        return redirect("adminpanel:ap_dashboard")   # namespaced admin URL
+
+    # Instructor
+    if u.role == "instructor":
+        if not getattr(u, "is_instructor_approved", False):
+            return redirect("accounts:instructor_pending")
+        return redirect("courses:instructor_dashboard")  # ✅ underscore
+
+    # Student
+    if u.role == "student":
+        return redirect("accounts:student_dashboard")
+
+    # Fallback
+    return redirect("/")
+
+
+@login_required
+def instructor_pending(request):
+    u = request.user
+    # If this user is not an unapproved instructor, don't show this page.
+    if not (getattr(u, "role", "") == "instructor" and not getattr(u, "is_instructor_approved", False)):
+        return redirect("/")  # or wherever you prefer
+    return render(request, "accounts/instructor_pending.html")

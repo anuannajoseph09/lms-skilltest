@@ -8,7 +8,32 @@
 </head>
 <body class="bg-gray-100 font-sans">
     <div class="container mx-auto px-4 py-8">
+         <div class="mb-4">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700"
+    onclick="(function(){
+      try {
+        var r = document.referrer;
+        if (r && new URL(r).origin === location.origin) { history.back(); }
+        else { location.href = '{% url 'adminpanel:ap_dashboard' %}'; }
+      } catch(e) {
+        location.href = '{% url 'adminpanel:ap_dashboard' %}';
+      }
+    })()"
+  >
+    ← Back
+  </button>
+
+  <noscript>
+    <a href="{% url 'adminpanel:ap_dashboard' %}"
+       class="inline-block ml-2 text-blue-600 hover:text-blue-800 underline">
+      Back
+    </a>
+  </noscript>
+</div>
         <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">{{ title }}</h2>
+        
 
         <form method="post" class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
             {% csrf_token %}
@@ -17,7 +42,7 @@
             </div>
             <div class="mt-6 flex justify-end space-x-4">
                 <a 
-                    href="{% url 'ap_user_list' %}" 
+                    href="{% url 'adminpanel:ap_user_list' %}" 
                     class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition duration-200"
                 >
                     Cancel

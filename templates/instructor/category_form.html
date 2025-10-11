@@ -9,6 +9,33 @@
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full mx-auto p-6 bg-white rounded-lg shadow-lg">
         <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">New Category</h2>
+<div class="mb-4">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700"
+    onclick="(function(){
+      try {
+        var r = document.referrer;
+        if (r && new URL(r).origin === location.origin) { history.back(); }
+        else { location.href = '{% url 'courses:instructor_dashboard' %}'; }
+      } catch(e) {
+        location.href = '{% url 'courses:instructor_dashboard' %}';
+      }
+    })()"
+  >
+    ← Back
+  </button>
+
+  <noscript>
+    <a href="{% url 'courses:instructor_dashboard' %}"
+       class="inline-block ml-2 text-blue-600 hover:text-blue-800 underline">
+      Back
+    </a>
+  </noscript>
+</div>
+
+
+        
         <form method="post" class="space-y-4">
             {% csrf_token %}
             <div>
@@ -21,6 +48,8 @@
             </div>
             <button type="submit" class="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Save</button>
         </form>
+        
     </div>
+    
 </body>
 </html>

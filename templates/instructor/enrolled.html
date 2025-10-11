@@ -5,44 +5,85 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="p-6">
-  <h1 class="text-2xl font-semibold mb-4">Enrolled – {{ course.title }}</h1>
 
-  <form method="post" class="mb-6 flex gap-2">
-    {% csrf_token %}
-    <input name="email" type="email" placeholder="student@example.com"
-           class="border rounded p-2 w-80" required>
-    <button class="bg-teal-600 text-white px-4 py-2 rounded">Add Student</button>
-  </form>
 
-  <table class="min-w-full border">
-    <thead class="bg-gray-50">
-      <tr>
-        <th class="p-2 text-left">Student</th>
-        <th class="p-2 text-left">Email</th>
-        <th class="p-2">Status</th>
-        <th class="p-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for e in items %}
+<h1 class="text-2xl font-semibold mb-4">Enrolled – {{ course.title }}</h1>
+<div class="mb-4">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700"
+    onclick="(function(){
+      try {
+        var r = document.referrer;
+        if (r && new URL(r).origin === location.origin) { history.back(); }
+        else { location.href = '{% url 'courses:instructor_dashboard' %}'; }
+      } catch(e) {
+        location.href = '{% url 'courses:instructor_dashboard' %}';
+      }
+    })()"
+  >
+    ← Back
+  </button>
+
+  <noscript>
+    <a href="{% url 'courses:instructor_dashboard' %}"
+       class="inline-block ml-2 text-blue-600 hover:text-blue-800 underline">
+      Back
+    </a>
+  </noscript>
+</div>
+
+
+<form method="post"
+      action="{% url 'enrollments:enrolled_students' course.id %}"
+      class="mb-6 flex gap-2 items-center">
+  {% csrf_token %}
+  <select name="user_id" class="border rounded p-2 min-w-[280px]" required>
+    <option value="" selected disabled>Select a student…</option>
+    {% for u in candidates %}
+      <option value="{{ u.id }}">
+        {{ u.get_full_name|default:u.username }}{% if u.email %} — {{ u.email }}{% endif %}
+      </option>
+    {% empty %}
+      <option disabled>No available users to add</option>
+    {% endfor %}
+  </select>
+  <button class="bg-teal-600 text-white px-4 py-2 rounded">Add to Course</button>
+</form>
+
+<table class="min-w-full border">
+  <thead class="bg-gray-50">
+    <tr>
+      <th class="p-2 text-left">Student</th>
+      <th class="p-2 text-left">Email</th>
+      <th class="p-2">Status</th>
+      <th class="p-2">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in items %}
       <tr class="border-t">
         <td class="p-2">{{ e.user.get_full_name|default:e.user.username }}</td>
         <td class="p-2">{{ e.user.email }}</td>
         <td class="p-2">{{ e.status|title }}</td>
         <td class="p-2 text-center">
           {% if e.status == 'pending' %}
-            <a href="{% url 'enrollments:approve_enrollment' e.id %}"
-               class="text-teal-700 underline">Approve</a>
+            <a href="{% url 'enrollments:approve_enrollment' e.id %}" class="text-teal-700 underline">Approve</a>
           {% else %}
             —
           {% endif %}
         </td>
       </tr>
-      {% empty %}
-      <tr><td class="p-4 text-gray-500" colspan="4">No enrollments yet.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    {% empty %}
+      <tr><td colspan="4" class="p-4 text-gray-500">No enrollments yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+
+
 
   <p class="mt-4">
     <a href="{% url 'enrollments:pending' %}" class="text-teal-700 underline">

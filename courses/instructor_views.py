@@ -4,7 +4,10 @@ from django.contrib import messages
 from accounts.roles import instructor_required
 from .models import Course, Category
 from .forms import CourseForm, CategoryForm
-from django.db.models import Count, Q, Max
+from django.db.models import Count, Q, Max, Avg
+from forum.models import Thread, Reply
+from django.views.decorators.cache import never_cache
+from learning.models import Lesson, LessonProgress
 
 
 # optional imports — only if these apps exist (they do in your milestones)
@@ -25,11 +28,10 @@ try:
 except Exception:
     Thread = None
 
-
+@never_cache
 @login_required
 def dashboard(request):
-    if not getattr(request.user, "is_instructor", lambda: False)():
-        return render(request, "instructor/not_allowed.html", status=403)
+    
 
     # All courses owned by this instructor with useful counters
     courses = (
@@ -67,10 +69,11 @@ def dashboard(request):
 
     if Thread:
         recent_threads = (
-            Thread.objects
-            .filter(course__instructor=request.user)
-            .select_related("author", "course")
-            .order_by("-created_at")[:5]
+          Thread.objects
+          .filter(course__instructor=request.user)
+          .select_related("course")
+          .annotate(replies_count=Count("replies"))
+          .order_by("-created_at")[:5]
         )
 
     if LiveSession:
@@ -115,7 +118,7 @@ def course_create(request):
         obj.instructor = request.user
         obj.save()
         messages.success(request, "Course created.")
-        return redirect("courses:my_courses")
+        return redirect("courses:instructor_my_courses")
     return render(request, "instructor/course_form.html", {"form": form, "title": "New Course"})
 
 @login_required
@@ -154,3 +157,116 @@ def category_create(request):
         form.save(); messages.success(request, "Category added.")
         return redirect("courses:category_list")
     return render(request, "instructor/category_form.html", {"form": form})
+
+@login_required
+def course_students(request, course_id):
+    """
+    For an instructor's course: show all enrolled students with
+    lesson-completion % (via LessonProgress) and quiz summary.
+    """
+    course = get_object_or_404(Course, pk=course_id, instructor=request.user)
+
+    # Total lessons in this course (avoid divide-by-zero)
+    lessons_total = course.lessons.count()
+
+    # Enrolled & approved students for this course
+    enrolls = (
+        Enrollment.objects
+        .filter(course=course, status=Enrollment.APPROVED)
+        .select_related("user")
+        .order_by("user__username")
+    )
+
+    # Completed lesson counts per user (uses your exact fields)
+    done_map = {
+        row["user_id"]: row["c"]
+        for row in (
+            LessonProgress.objects
+            .filter(lesson__course=course, is_completed=True)
+            .values("user_id")
+            .annotate(c=Count("id"))
+        )
+    }
+
+    # Quiz rollup per user (attempts, avg, last submission time)
+    quiz_map = {
+        row["user_id"]: row
+        for row in (
+            Submission.objects
+            .filter(quiz__course=course)
+            .values("user_id")
+            .annotate(
+                attempts=Count("id"),
+                avg_score=Avg("score"),
+                last_time=Max("submitted_at"),
+            )
+        )
+    }
+
+    # Build rows for template
+    rows = []
+    for e in enrolls:
+        uid = e.user_id
+        lessons_done = done_map.get(uid, 0)
+        pct = round((lessons_done / lessons_total) * 100) if lessons_total else 0
+        qm = quiz_map.get(uid)
+        rows.append({
+            "user": e.user,
+            "lessons_done": lessons_done,
+            "lessons_total": lessons_total,
+            "progress_pct": pct,
+            "quiz_attempts": qm["attempts"] if qm else 0,
+            "avg_score": round(qm["avg_score"], 1) if (qm and qm["avg_score"] is not None) else None,
+            "last_time": qm["last_time"] if qm else None,
+        })
+
+    return render(request, "instructor/progress/course_students.html", {
+        "course": course,
+        "rows": rows,
+    })
+
+
+@login_required
+def student_progress_detail(request, course_id, user_id):
+    """
+    For a single student in an instructor's course:
+    show which lessons are completed and their quiz submissions.
+    """
+    course = get_object_or_404(Course, pk=course_id, instructor=request.user)
+
+    lessons = (
+        Lesson.objects
+        .filter(course=course)
+        .order_by("order", "id")
+        .prefetch_related("materials")
+    )
+
+    # Set of completed lesson IDs for this student
+    done_ids = set(
+        LessonProgress.objects
+        .filter(lesson__course=course, user_id=user_id, is_completed=True)
+        .values_list("lesson_id", flat=True)
+    )
+
+    # Student’s quiz submissions for this course
+    subs = (
+        Submission.objects
+        .filter(quiz__course=course, user_id=user_id)
+        .select_related("quiz")
+        .order_by("-submitted_at")
+    )
+
+    # Progress %
+    total = lessons.count()
+    pct = round((len(done_ids) / total) * 100) if total else 0
+
+    return render(request, "instructor/progress/student_detail.html", {
+        "course": course,
+        "student_id": user_id,
+        "lessons": lessons,
+        "done_ids": done_ids,
+        "submissions": subs,
+        "progress_pct": pct,
+    })
+
+

@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My Progress</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-6">
+  <h1 class="text-2xl font-semibold mb-4">My progress</h1>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+    {% for it in items %}
+      <div class="bg-white rounded shadow p-4">
+        <div class="font-semibold">{{ it.course.title }}</div>
+        <div class="text-sm text-gray-600">{{ it.course.category }}</div>
+        <div class="mt-3 text-sm">Progress: {{ it.percent }}%</div>
+        <div class="h-2 bg-gray-200 rounded">
+          <div class="h-2 bg-sky-600 rounded" style="width: {{ it.percent }}%"></div>
+        </div>
+        <div class="text-sm mt-2">
+          Last quiz score:
+          {% if it.last_score %}<span class="font-medium">{{ it.last_score }}</span>{% else %}—{% endif %}
+        </div>
+        <a href="{% url 'courses:learn' it.course.id %}" class="inline-block mt-3 text-sky-700 underline">
+          Continue →
+        </a>
+      </div>
+    {% empty %}
+      <p>You have no approved enrollments.</p>
+    {% endfor %}
+  </div>
+</body>
+</html>

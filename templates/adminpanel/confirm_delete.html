@@ -1,5 +1,99 @@
-<h2>Delete {{ what }}?</h2>
-<form method="post">{% csrf_token %}
-  <button type="submit">Yes, delete</button>
-  <a href="{% url 'ap_user_list' %}">Cancel</a>
-</form>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Delete</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .delete-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 360px;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .delete-box h2 {
+      color: #dc3545;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .delete-box p {
+      color: #555;
+      margin-bottom: 25px;
+      font-size: 15px;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    button {
+      background-color: #dc3545;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #b02a37;
+      transform: translateY(-2px);
+    }
+
+    a {
+      background-color: #6c757d;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    a:hover {
+      background-color: #5a6268;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="delete-box">
+    <h2>Delete {{ what }}?</h2>
+    <p>Are you sure you want to permanently delete this item? This action cannot be undone.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="btn-group">
+        <button type="submit">Yes, delete</button>
+        <a href="{% url 'adminpanel:ap_dashboard' %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

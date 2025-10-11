@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><title>Manage Enrollments — {{ course.title }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6">
+  <h1 class="text-2xl font-semibold mb-2">Manage Enrollments — {{ course.title }}</h1>
+  <div class="mb-4">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700"
+    onclick="(function(){
+      try {
+        var r = document.referrer;
+        if (r && new URL(r).origin === location.origin) { history.back(); }
+        else { location.href = '{% url 'courses:instructor_dashboard' %}'; }
+      } catch(e) {
+        location.href = '{% url 'courses:instructor_dashboard' %}';
+      }
+    })()"
+  >
+    ← Back
+  </button>
+
+  <noscript>
+    <a href="{% url 'courses:instructor_dashboard' %}"
+       class="inline-block ml-2 text-blue-600 hover:text-blue-800 underline">
+      Back
+    </a>
+  </noscript>
+</div>
+
+  <p class="text-gray-600 mb-4">Search all students, then add to this course.</p>
+
+  {# Flash messages #}
+  {% if messages %}
+    <div class="mb-4 space-y-2">
+      {% for m in messages %}
+        <div class="px-3 py-2 rounded border
+            {% if m.tags == 'success' %}bg-green-50 text-green-800 border-green-200
+            {% elif m.tags == 'error' %}bg-red-50 text-red-800 border-red-200
+            {% else %}bg-gray-50 text-gray-800 border-gray-200{% endif %}">
+          {{ m }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# Search bar #}
+  <form method="get" class="mb-4 flex gap-2">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search by name, username, or email"
+           class="border rounded p-2 w-[360px]">
+    <button class="bg-gray-800 text-white px-4 py-2 rounded">Search</button>
+    {% if q %}
+      <a href="{% url 'enrollments:manage_course_enrollments' course.id %}"
+         class="px-3 py-2 rounded border">Clear</a>
+    {% endif %}
+  </form>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    {# Left: All Students (paginated) #}
+    <div>
+      <h2 class="font-semibold mb-2">All Students</h2>
+      <table class="min-w-full border">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="p-2 text-left">Student</th>
+            <th class="p-2 text-left hidden md:table-cell">Email</th>
+            <th class="p-2 text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in page_obj %}
+            <tr class="border-t">
+              <td class="p-2">
+                {{ u.get_full_name|default:u.username }}
+                <div class="text-xs text-gray-500 md:hidden">{{ u.email }}</div>
+              </td>
+              <td class="p-2 hidden md:table-cell">{{ u.email }}</td>
+              <td class="p-2 text-center">
+                {% if u.id in enrolled_ids %}
+                  <span class="text-green-700 font-medium">Enrolled ✓</span>
+                {% else %}
+                  <form method="post"
+                        action="{% url 'enrollments:manage_course_enrollments' course.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                    <button class="bg-teal-600 text-white px-3 py-1.5 rounded text-sm">
+                      Add to Course
+                    </button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3" class="p-3 text-gray-500">No students found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {# Pagination #}
+      {% if page_obj.paginator.num_pages > 1 %}
+        <div class="flex items-center gap-2 mt-3">
+          {% if page_obj.has_previous %}
+            <a class="px-3 py-1 border rounded"
+               href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.previous_page_number }}">Prev</a>
+          {% endif %}
+          <span class="text-sm text-gray-600">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+          </span>
+          {% if page_obj.has_next %}
+            <a class="px-3 py-1 border rounded"
+               href="?{% if q %}q={{ q|urlencode }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {# Right: Already enrolled (quick view) #}
+    <div>
+      <h2 class="font-semibold mb-2">Already Enrolled</h2>
+      <table class="min-w-full border">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="p-2 text-left">Student</th>
+            <th class="p-2 text-left hidden md:table-cell">Email</th>
+            <th class="p-2 text-left">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in enrollments %}
+            <tr class="border-t">
+              <td class="p-2">{{ e.user.get_full_name|default:e.user.username }}</td>
+              <td class="p-2 hidden md:table-cell">{{ e.user.email }}</td>
+              <td class="p-2">{{ e.status|title }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3" class="p-3 text-gray-500">No one enrolled yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="mt-6">
+    <a href="{% url 'courses:instructor_dashboard' %}" class="text-teal-700 underline">← Back to dashboard</a>
+  </p>
+</body>
+</html>
+

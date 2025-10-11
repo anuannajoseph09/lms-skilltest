@@ -1,39 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>My Quizzes</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Quizzes | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .table-header { @apply bg-gray-100 text-gray-700 font-semibold text-sm uppercase tracking-wide; }
+        .table-row:hover { @apply bg-gray-50 transition-colors duration-150; }
+        .btn-back { @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all; }
+        .no-js-link { @apply text-blue-600 hover:text-blue-700 underline transition-colors; }
+    </style>
 </head>
-<body class="bg-gray-100 p-6">
-  <h1 class="text-2xl font-semibold mb-4">My Quizzes</h1>
-  <p class="mb-4"><a class="text-blue-600 underline" href="{% url 'student_dashboard' %}">← Back to dashboard</a></p>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header Section -->
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">My Quizzes</h1>
+            <div class="flex items-center gap-4">
+                <button
+                    type="button"
+                    class="btn-back"
+                    onclick="(function(){
+                        try {
+                            var r = document.referrer;
+                            if (r && new URL(r).origin === location.origin) { history.back(); }
+                            else { location.href = '{% url 'accounts:student_dashboard' %}'; }
+                        } catch(e) {
+                            location.href = '{% url 'accounts:student_dashboard' %}';
+                        }
+                    })()"
+                    aria-label="Go back to previous page or dashboard"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Back
+                </button>
+                <noscript>
+                    <a href="{% url 'accounts:student_dashboard' %}" class="no-js-link" aria-label="Back to dashboard">Back</a>
+                </noscript>
+            </div>
+        </div>
 
-  {% if submissions %}
-    <div class="bg-white p-4 rounded shadow overflow-x-auto">
-      <table class="min-w-full text-sm">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-3 py-2 text-left">Quiz</th>
-            <th class="px-3 py-2 text-left">Course</th>
-            <th class="px-3 py-2 text-left">Score</th>
-            <th class="px-3 py-2 text-left">Submitted</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for s in submissions %}
-            <tr class="border-b">
-              <td class="px-3 py-2">{{ s.quiz.title }}</td>
-              <td class="px-3 py-2">{{ s.quiz.course.title }}</td>
-              <td class="px-3 py-2">{{ s.score }}%</td>
-              <td class="px-3 py-2">{{ s.submitted_at|date:"M d, Y H:i" }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <!-- Quiz Table or Empty State -->
+        {% if submissions %}
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="table-header">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 text-left">Quiz</th>
+                                <th scope="col" class="px-6 py-4 text-left">Course</th>
+                                <th scope="col" class="px-6 py-4 text-left">Score</th>
+                                <th scope="col" class="px-6 py-4 text-left">Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for s in submissions %}
+                                <tr class="table-row">
+                                    <td class="px-6 py-4 text-gray-900">{{ s.quiz.title }}</td>
+                                    <td class="px-6 py-4 text-gray-600">{{ s.quiz.course.title }}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium
+                                            {% if s.score >= 80 %}bg-green-100 text-green-800
+                                            {% elif s.score >= 50 %}bg-yellow-100 text-yellow-800
+                                            {% else %}bg-red-100 text-red-800{% endif %}">
+                                            {{ s.score }}%
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-600">{{ s.submitted_at|date:"M d, Y H:i" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-12 bg-white rounded-xl shadow-sm">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3 class="mt-2 text-lg font-medium text-gray-900">No quiz attempts yet</h3>
+                <p class="mt-1 text-gray-500">Get started by taking a quiz from your dashboard.</p>
+                <div class="mt-6">
+                    <a href="{% url 'accounts:student_dashboard' %}" 
+                       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Go to Dashboard
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     </div>
-  {% else %}
-    <p class="text-gray-600">No quiz attempts yet.</p>
-  {% endif %}
+
+    <!-- Optional: Add subtle footer -->
+    <footer class="mt-12 text-center text-gray-500 text-sm">
+        <p>&copy; {{ "now"|date:"Y" }} Quiz Platform. All rights reserved.</p>
+    </footer>
 </body>
 </html>

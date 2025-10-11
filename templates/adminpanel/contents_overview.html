@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Contents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6 space-y-8">
+   <div class="mb-4">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700"
+    onclick="(function(){
+      try {
+        var r = document.referrer;
+        if (r && new URL(r).origin === location.origin) { history.back(); }
+        else { location.href = '{% url 'adminpanel:ap_dashboard' %}'; }
+      } catch(e) {
+        location.href = '{% url 'adminpanel:ap_dashboard' %}';
+      }
+    })()"
+  >
+    ← Back
+  </button>
+
+  <noscript>
+    <a href="{% url 'adminpanel:ap_dashboard' %}"
+       class="inline-block ml-2 text-blue-600 hover:text-blue-800 underline">
+      Back
+    </a>
+  </noscript>
+</div>
+
+  <h1 class="text-2xl font-bold">Content Management</h1>
+
+  {# Optional: show Django messages #}
+  {% if messages %}
+    <div class="space-y-2">
+      {% for m in messages %}
+        <div class="px-3 py-2 rounded
+                    {% if m.tags == 'success' %}bg-green-50 text-green-800
+                    {% elif m.tags == 'error' %}bg-red-50 text-red-800
+                    {% else %}bg-blue-50 text-blue-800{% endif %}">
+          {{ m }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Materials -->
+  <section>
+    <h2 class="text-xl font-semibold mb-2">Materials (latest 50)</h2>
+    {% if materials %}
+      <table class="min-w-full border">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="p-2 text-left">Course / Lesson</th>
+            <th class="p-2 text-left">Type</th>
+            <th class="p-2 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in materials %}
+            <tr class="border-t">
+              <td class="p-2">{{ m.lesson.course.title }} — {{ m.lesson.title }}</td>
+              <td class="p-2">{{ m.get_type_display }}</td>
+              <td class="p-2 text-center">
+                <form method="post" action="{% url 'adminpanel:ap_material_delete' m.id %}">
+                  {% csrf_token %}
+                  <button class="text-red-700 underline">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="text-gray-500">No materials.</p>
+    {% endif %}
+  </section>
+
+  <!-- Quizzes -->
+<section>
+  <h2 class="text-xl font-semibold mb-2">Quizzes (latest 50)</h2>
+  {% if quizzes %}
+    <table class="min-w-full border">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="p-2 text-left">Course</th>
+          <th class="p-2 text-left">Title</th>
+          <th class="p-2 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for q in quizzes %}
+          <tr class="border-t">
+            <td class="p-2">{{ q.course.title }}</td>
+            <td class="p-2">{{ q.title }}</td>
+            <td class="p-2 text-center">
+              <form method="post" action="{% url 'adminpanel:ap_quiz_delete' q.id %}" class="inline">
+                {% csrf_token %}
+                <button class="text-red-700 underline">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-gray-500">No quizzes.</p>
+  {% endif %}
+</section>
+
+
+  <!-- Threads -->
+  <section>
+    <h2 class="text-xl font-semibold mb-2">Forum Threads (latest 50)</h2>
+    {% if threads %}
+      <table class="min-w-full border">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="p-2 text-left">Course</th>
+            <th class="p-2 text-left">Title</th>
+            <th class="p-2 text-left">Author</th>
+            <th class="p-2 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in threads %}
+            <tr class="border-t">
+              <td class="p-2">{{ t.course.title }}</td>
+              <td class="p-2">{{ t.title }}</td>
+              <td class="p-2">{% if t.author %}{{ t.author.username }}{% else %}—{% endif %}</td>
+              <td class="p-2 text-center">
+                <form method="post" action="{% url 'adminpanel:ap_thread_delete' t.id %}">
+                  {% csrf_token %}
+                  <button class="text-red-700 underline">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="text-gray-500">No threads.</p>
+    {% endif %}
+  </section>
+
+</body>
+</html>
+
+

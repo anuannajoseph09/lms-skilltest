@@ -13,7 +13,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin','django.contrib.auth','django.contrib.contenttypes',
     'django.contrib.sessions','django.contrib.messages','django.contrib.staticfiles',
-    'accounts','courses','learning','quizzes','forum','enrollments','analytics',
+    'accounts','courses','learning','quizzes','forum','enrollments','analytics','widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -24,6 +24,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accounts.middleware.InstructorApprovalGate',
 ]
 
 ROOT_URLCONF = 'lms.urls'
@@ -63,9 +64,10 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
-LOGIN_URL = "/accounts/login/"
-LOGOUT_REDIRECT_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/accounts/redirect_after_login/"  # we'll create this soon
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "accounts:redirect_after_login"   # after *any* successful login
+LOGOUT_REDIRECT_URL = "accounts:login"
+
 
 # ✅ Static & media (define once)
 STATIC_URL = 'static/'

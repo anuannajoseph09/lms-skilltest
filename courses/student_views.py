@@ -7,6 +7,9 @@ from django.contrib.auth import get_user_model
 
 from .models import Course, Category
 from enrollments.models import Enrollment
+from learning.models import Lesson, LessonProgress
+from quizzes.models import Submission
+
 
 User = get_user_model()
 
@@ -96,11 +99,75 @@ def course_learn(request, course_id):
         messages.error(request, "You must be enrolled (approved) to access this course.")
         return redirect("courses:catalog")
 
-    lessons = course.lessons.all().prefetch_related("materials").order_by("order", "id")
-    quizzes = course.quizzes.all().order_by("id")
+    lessons = list(course.lessons.all().prefetch_related("materials").order_by("order", "id"))
+    # set of completed lesson ids
+    done_ids = set(
+        LessonProgress.objects.filter(user=request.user, lesson__course=course, is_completed=True)
+        .values_list("lesson_id", flat=True)
+    )
+    # progress %
+    total = len(lessons) or 1
+    completed = sum(1 for l in lessons if l.id in done_ids)
+    percent = int(round((completed / total) * 100, 0))
+
+    # last 10 quiz submissions in this course
+    quiz_subs = (Submission.objects
+                 .filter(user=request.user, quiz__course=course)
+                 .select_related("quiz")
+                 .order_by("-submitted_at")[:10])
 
     return render(request, "student/courses/learn.html", {
         "course": course,
         "lessons": lessons,
-        "quizzes": quizzes,
+        "done_ids": done_ids,
+        "progress_percent": percent,
+        "quiz_subs": quiz_subs,
     })
+
+
+
+@login_required
+def mark_lesson_done(request, lesson_id):
+    """POST: mark the lesson as completed by current user."""
+    lesson = get_object_or_404(Lesson, pk=lesson_id)
+    # must be enrolled + approved
+    ok = Enrollment.objects.filter(
+        user=request.user, course=lesson.course, status=Enrollment.APPROVED
+    ).exists()
+    if not ok:
+        messages.error(request, "You must be enrolled in the course.")
+        return redirect("courses:learn", course_id=lesson.course_id)
+
+    # create/update the flag
+    LessonProgress.objects.update_or_create(
+        user=request.user, lesson=lesson,
+        defaults={"is_completed": True},
+    )
+    messages.success(request, f"Marked '{lesson.title}' as completed.")
+    return redirect("courses:learn", course_id=lesson.course_id)
+
+
+@login_required
+def my_progress(request):
+    """Card view of all approved enrollments with a progress bar + last quiz score."""
+    enrolls = (Enrollment.objects
+               .filter(user=request.user, status=Enrollment.APPROVED)
+               .select_related("course", "course__category", "course__instructor"))
+    items = []
+    for en in enrolls:
+        course = en.course
+        lessons = list(course.lessons.all())
+        total = len(lessons) or 1
+        done = LessonProgress.objects.filter(user=request.user, lesson__in=lessons, is_completed=True).count()
+        percent = int(round(done / total * 100, 0))
+
+        last_sub = (Submission.objects
+                    .filter(user=request.user, quiz__course=course)
+                    .select_related("quiz")
+                    .order_by("-submitted_at")
+                    .first())
+        last_score = f"{last_sub.score:.0f}" if last_sub else None
+
+        items.append({"course": course, "percent": percent, "last_score": last_score})
+
+    return render(request, "student/progress/index.html", {"items": items})

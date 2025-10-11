@@ -1,49 +1,162 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
   <meta charset="utf-8" />
   <title>{{ course.title }} — Learn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50">
-  <div class="max-w-5xl mx-auto p-6">
-    <h1 class="text-2xl font-semibold mb-2">{{ course.title }}</h1>
-    <p class="text-gray-600 mb-4">{{ course.description }}</p>
+<body class="bg-gray-50 text-gray-900">
+  <div class="max-w-6xl mx-auto p-6">
 
-    <h2 class="text-xl font-semibold mt-6 mb-2">Lessons</h2>
+    <!-- Header + forum shortcuts -->
+    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold">{{ course.title }}</h1>
+        <p class="text-gray-600">{{ course.description }}</p>
+        <p class="text-sm text-gray-500 mt-1">
+          Category: {{ course.category }} • Instructor: {{ course.instructor.username }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a href="{% url 'forum:thread_list' course.id %}"
+           class="inline-flex items-center gap-2 text-sky-700 underline">
+          💬 Open forum →
+        </a>
+        <a href="{% url 'forum:thread_create' course.id %}"
+           class="inline-flex items-center gap-2 text-sky-700 underline">
+          ➕ Start thread
+        </a>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="mt-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold">Your progress</h2>
+        <span class="text-sm text-gray-600">{{ progress_percent|default:"0" }}%</span>
+      </div>
+      <div class="h-2 bg-gray-200 rounded">
+        <div class="h-2 bg-sky-600 rounded"
+             style="width: {{ progress_percent|default:'0' }}%"></div>
+      </div>
+    </div>
+
+    <!-- Lessons -->
+    <h2 class="text-xl font-semibold mt-8 mb-3">Lessons</h2>
     <div class="space-y-3">
       {% for l in lessons %}
         <div class="bg-white p-4 rounded shadow">
-          <h3 class="font-semibold">{{ l.order }}. {{ l.title }}</h3>
-          <p class="text-sm text-gray-600 mb-2">{{ l.description }}</p>
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div>
+              <h3 class="font-semibold">
+                {{ l.order }}. {{ l.title }}
+                {% if l.id in done_ids %}
+                  <span class="ml-2 text-green-700 text-sm">✓ Completed</span>
+                {% endif %}
+              </h3>
+              <p class="text-sm text-gray-600 mb-2">{{ l.description }}</p>
 
-          <ul class="list-disc ml-6 text-sm">
-            {% for m in l.materials.all %}
-              <li>
-                {{ m.get_type_display }}:
-                <a class="text-[#068DAA] underline" href="{{ m.file.url }}" target="_blank">Open</a>
-              </li>
-            {% empty %}
-              <li>No materials</li>
-            {% endfor %}
-          </ul>
+              <ul class="list-disc ml-6 text-sm">
+                {% for m in l.materials.all %}
+                  <li class="mb-1">
+                    {{ m.get_type_display }}:
+                    <a class="text-sky-700 underline" href="{{ m.file.url }}" target="_blank" rel="noopener">
+                      Open
+                    </a>
+                  </li>
+                {% empty %}
+                  <li>No materials</li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            {% if not l.id in done_ids %}
+              <form method="post" action="{% url 'courses:mark_lesson_done' l.id %}">
+                {% csrf_token %}
+                <button class="px-3 py-1 bg-sky-600 text-white rounded hover:bg-sky-700">
+                  Mark done
+                </button>
+              </form>
+            {% endif %}
+          </div>
         </div>
       {% empty %}
         <p>No lessons yet.</p>
       {% endfor %}
     </div>
 
-    <h2 class="text-xl font-semibold mt-8 mb-2">Quizzes</h2>
+    <!-- Live Sessions (optional for course) -->
+    <h2 class="text-xl font-semibold mt-8 mb-3">Live Classes</h2>
+    {% with sessions=course.live_sessions.all %}
+      {% if sessions %}
+        <ul class="space-y-2">
+          {% for s in sessions|dictsort:"start_time" %}
+            <li class="bg-white p-4 rounded shadow flex items-center justify-between">
+              <div>
+                <div class="font-medium">{{ s.title }}</div>
+                <div class="text-xs text-gray-500">
+                  {{ s.start_time|date:"M d, Y H:i" }} – {{ s.end_time|date:"H:i" }}
+                </div>
+              </div>
+              {% if s.meet_link %}
+                <a href="{{ s.meet_link }}" target="_blank" rel="noopener"
+                   class="text-sky-700 underline">Join</a>
+              {% else %}
+                <span class="text-xs text-gray-500">Link not set</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-gray-600">No live sessions yet.</p>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Quizzes -->
+    <h2 class="text-xl font-semibold mt-8 mb-3">Quizzes</h2>
     <ul class="list-disc ml-6">
-      {% for q in quizzes %}
-        <li>
+      {% for q in course.quizzes.all %}
+        <li class="mb-1">
           {{ q.title }} —
-          <a href="{% url 'quizzes:take' q.id %}" class="text-[#068DAA] underline">Take quiz</a>
+          <a href="{% url 'quizzes:take_quiz' q.id %}" class="text-sky-700 underline">Take quiz</a>
         </li>
       {% empty %}
         <li>No quizzes yet.</li>
       {% endfor %}
     </ul>
+
+    <!-- Recent quiz attempts -->
+    <h2 class="text-xl font-semibold mt-8 mb-2">Recent quiz attempts</h2>
+    <div class="bg-white rounded shadow overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-100 text-gray-700">
+          <tr>
+            <th class="px-4 py-2 text-left">Quiz</th>
+            <th class="px-4 py-2 text-left">Score</th>
+            <th class="px-4 py-2 text-left">Submitted</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in quiz_subs %}
+            <tr class="border-t">
+              <td class="px-4 py-2">{{ s.quiz.title }}</td>
+              <td class="px-4 py-2">{{ s.score|floatformat:0 }}%</td>
+              <td class="px-4 py-2">{{ s.submitted_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td class="px-4 py-3" colspan="3">No attempts yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Back -->
+    <div class="mt-8">
+      <a href="{% url 'courses:catalog' %}" class="text-sky-700 underline">← Back to catalog</a>
+    </div>
   </div>
 </body>
 </html>
+

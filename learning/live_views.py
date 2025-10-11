@@ -24,8 +24,10 @@ def live_create(request, course_id):
     c = get_object_or_404(Course, pk=course_id, instructor=request.user)
     form = LiveForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        obj = form.save(commit=False); obj.course = c; obj.save()
-        return redirect("live_list", course_id=c.id)
+        obj = form.save(commit=False)
+        obj.course = c
+        obj.save()
+        return redirect("learning:live_list", course_id=c.id)   # <-- namespaced
     return render(request, "instructor/live_form.html", {"form": form, "course": c})
 
 @login_required
@@ -33,5 +35,6 @@ def live_edit(request, pk):
     s = get_object_or_404(LiveSession, pk=pk, course__instructor=request.user)
     form = LiveForm(request.POST or None, instance=s)
     if request.method == "POST" and form.is_valid():
-        form.save(); return redirect("live_list", course_id=s.course.id)
+        form.save()
+        return redirect("learning:live_list", course_id=s.course.id)  # <-- namespaced
     return render(request, "instructor/live_form.html", {"form": form, "course": s.course})

@@ -34,6 +34,32 @@
   </div>
 </div>
 
+
+<div class="card shadow-sm mt-4">
+  <div class="card-body d-flex flex-wrap align-items-center justify-content-between">
+    <div class="me-3">
+      <h5 class="mb-1">Student Progress Tracking</h5>
+      <ul class="mb-0 text-muted small">
+        <li>View enrolled students</li>
+        <li>Track completed lessons & quiz attempts</li>
+        <li>See average scores & last activity</li>
+      </ul>
+    </div>
+
+    {% if courses %}
+      <div class="d-flex flex-wrap gap-2">
+        {% for c in courses %}
+          <a href="{% url 'courses:course_students' c.id %}" class="btn btn-outline-primary btn-sm">
+            {{ c.title|truncatechars:24 }}
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <a href="{% url 'courses:course_create' %}" class="btn btn-primary">Create your first course</a>
+    {% endif %}
+  </div>
+</div>
+
 <!-- My Courses -->
 <h5 class="mt-5 mb-3 fw-semibold">My Courses</h5>
 {% if courses %}
@@ -107,8 +133,8 @@
   </div>
 </div>
 
-<!-- Forum Threads + Quiz Submissions -->
 <div class="row g-3 mt-4">
+
   <!-- Forum Threads -->
   <div class="col-md-6">
     <div class="card shadow-sm">
@@ -116,15 +142,46 @@
       <ul class="list-group list-group-flush">
         {% for t in recent_threads %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span>{{ t.title|truncatechars:40 }}</span>
-            <a href="{% url 'forum:forum_threads' t.course.id %}" class="btn btn-sm btn-outline-secondary">Open</a>
+            <div>
+              <div class="fw-semibold">{{ t.title|truncatechars:40 }}</div>
+              <div class="text-muted small">
+                {{ t.course.title }} • {{ t.replies_count|default:"0" }} reply{{ t.replies_count|pluralize }}
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              <!-- Open thread details -->
+              <a href="{% url 'forum:instructor_thread_detail' t.id %}" 
+                 class="btn btn-sm btn-outline-secondary">
+                Open
+              </a>
+
+              <!-- Reply directly (optional shortcut) -->
+         
+            </div>
           </li>
         {% empty %}
           <li class="list-group-item text-muted">No new forum threads</li>
         {% endfor %}
       </ul>
+
+    <div class="card-footer bg-white text-center">
+  {% with first_course=courses.0 %}
+    {% if first_course %}
+      <a href="{% url 'forum:instructor_thread_list' first_course.id %}"
+         class="text-decoration-none small text-primary">
+        View All Threads →
+      </a>
+    {% else %}
+      <span class="text-muted small">Create a course to view forum threads</span>
+    {% endif %}
+  {% endwith %}
+</div>
+
     </div>
   </div>
+{# templates/instructor/dashboard.html #}
+
 
   <!-- Latest Quiz Results -->
   <div class="col-md-6">
@@ -133,7 +190,8 @@
       <ul class="list-group list-group-flush">
         {% for s in latest_results %}
           <li class="list-group-item">
-            {{ s.user.username }} — {{ s.quiz.title }} ({{ s.score }}%)
+            <strong>{{ s.user.username }}</strong> — {{ s.quiz.title }} 
+            <span class="text-muted">({{ s.score }}%)</span>
           </li>
         {% empty %}
           <li class="list-group-item text-muted">No recent quiz submissions</li>
@@ -141,6 +199,9 @@
       </ul>
     </div>
   </div>
+
 </div>
+
+
 
 {% endblock %}

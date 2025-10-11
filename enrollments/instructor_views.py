@@ -27,6 +27,7 @@ def enrolled_students(request, course_id):
 
     course = get_object_or_404(Course, pk=course_id, instructor=request.user)
 
+    # current enrollments (left/roster table)
     items = (
         Enrollment.objects
         .filter(course=course)
@@ -34,29 +35,40 @@ def enrolled_students(request, course_id):
         .order_by("-created_at")
     )
 
-    # Add/Register a student by email (POST)
+    # POST: add existing student by user_id
     if request.method == "POST":
-        email = request.POST.get("email", "").strip().lower()
-        if not email:
-            messages.error(request, "Enter a student email.")
+        user_id = request.POST.get("user_id")
+        if not user_id:
+            messages.error(request, "Please select a student.")
             return redirect("enrollments:enrolled_students", course_id=course.id)
 
-        try:
-            student = User.objects.get(email=email, role="student")
-        except User.DoesNotExist:
-            messages.error(request, "No student with that email.")
-            return redirect("enrollments:enrolled_students", course_id=course.id)
+        student = get_object_or_404(User, pk=user_id, role="student")
 
         obj, created = Enrollment.objects.get_or_create(user=student, course=course)
         if created:
+            # set default status if your model doesn't default to APPROVED
+            # obj.status = Enrollment.APPROVED
+            # obj.save(update_fields=["status"])
             messages.success(request, f"{student.get_full_name() or student.username} added.")
         else:
-            messages.info(request, "Student is already enrolled (status: %s)." % obj.status)
+            messages.info(request, f"Student already enrolled (status: {obj.status}).")
+
         return redirect("enrollments:enrolled_students", course_id=course.id)
+
+    # candidates for dropdown = students not yet enrolled in this course
+    already_ids = items.values_list("user_id", flat=True)
+    candidates = (
+        User.objects
+        .filter(role="student")
+        .exclude(id__in=already_ids)
+        .exclude(is_superuser=True)
+        .order_by("username")
+    )
 
     return render(request, "instructor/enrolled.html", {
         "course": course,
         "items": items,
+        "candidates": candidates,   # <-- pass to template
     })
 
 
@@ -112,3 +124,5 @@ def reject(request, enrollment_id):
     e.save(update_fields=["status"])
     messages.info(request, f"Rejected {e.user.username} for {e.course.title}.")
     return redirect("enrollments:pending")
+
+

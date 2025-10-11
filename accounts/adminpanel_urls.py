@@ -1,7 +1,7 @@
 from django.urls import path
 from . import adminpanel_views as ap
 
-
+app_name = "adminpanel"   # 👈 add this
 urlpatterns = [
     path("ping/", ap.ping, name="ap_ping"),
 
@@ -21,5 +21,17 @@ urlpatterns = [
     path("categories/new/", ap.category_create, name="ap_category_create"),
     path("categories/<int:pk>/delete/", ap.category_delete, name="ap_category_delete"),
     path("dashboard/", ap.dashboard, name="ap_dashboard"),
+    
+# courses
+    path("courses/", ap.course_list, name="ap_course_list"),
+    path("courses/<int:pk>/toggle/", ap.course_toggle_active, name="ap_course_toggle"),
+    path("courses/<int:pk>/delete/", ap.course_delete, name="ap_course_delete"),
+    # content management
+    path("contents/", ap.contents_overview, name="ap_contents"),
+    path("contents/materials/<int:pk>/delete/", ap.material_delete, name="ap_material_delete"),
+    path("contents/quizzes/<int:pk>/toggle/", ap.quiz_toggle_active, name="ap_quiz_toggle"),
+    path("contents/quizzes/<int:pk>/delete/", ap.quiz_delete, name="ap_quiz_delete"),
+    path("contents/threads/<int:pk>/delete/", ap.thread_delete, name="ap_thread_delete"),
+
 
 ]

@@ -1,7 +1,7 @@
 # enrollments/urls.py
 from django.urls import path
 from . import instructor_views as iv
-
+from . import views
 app_name = "enrollments"
 
 urlpatterns = [
@@ -13,4 +13,9 @@ urlpatterns = [
     path("instructor/pending/", iv.pending_for_my_courses, name="pending"),
     path("instructor/approve/<int:enrollment_id>/", iv.approve, name="approve"),
     path("instructor/reject/<int:enrollment_id>/", iv.reject, name="reject"),
+    path(
+        "instructor/<int:course_id>/",
+        views.instructor_manage_enrollments,
+        name="manage_course_enrollments",
+    ),
 ]

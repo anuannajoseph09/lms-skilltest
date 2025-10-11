@@ -1,34 +1,42 @@
-"""
-URL configuration for lms project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("adminpanel/", include("accounts.adminpanel_urls")),
-    path('accounts/', include('accounts.urls')),
-    path('courses/', include('courses.urls')),
-    path('enroll/', include('enrollments.urls')),
-    path('quiz/', include('quizzes.urls')),
-    path('forum/', include('forum.urls')),
-    path('analytics/', include('analytics.urls')),
-    path('learning/', include('learning.urls')),
+    path("admin/", admin.site.urls),
 
-
+    # namespaced includes (critical)
+    path(
+        "adminpanel/",
+        include(("accounts.adminpanel_urls", "adminpanel"), namespace="adminpanel"),
+    ),
+    path(
+        "accounts/",
+        include(("accounts.urls", "accounts"), namespace="accounts"),
+    ),
+    path(
+        "courses/",
+        include(("courses.urls", "courses"), namespace="courses"),
+    ),
+    path(
+        "enrollments/",
+        include(("enrollments.urls", "enrollments"), namespace="enrollments"),
+    ),
+    path(
+        "quizzes/",  # <-- use plural consistently
+        include(("quizzes.urls", "quizzes"), namespace="quizzes"),
+    ),
+    path(
+        "forum/",
+        include(("forum.urls", "forum"), namespace="forum"),
+    ),
+    path(
+        "analytics/",
+        include(("analytics.urls", "analytics"), namespace="analytics"),
+    ),
+    path(
+        "learning/",
+        include(("learning.urls", "learning"), namespace="learning"),
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -6,6 +6,31 @@
 </head>
 <body class="p-6">
   <h1 class="text-2xl font-semibold mb-4">Pending enrollments (my courses)</h1>
+  <div class="mb-4">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700"
+    onclick="(function(){
+      try {
+        var r = document.referrer;
+        if (r && new URL(r).origin === location.origin) { history.back(); }
+        else { location.href = '{% url 'courses:instructor_dashboard' %}'; }
+      } catch(e) {
+        location.href = '{% url 'courses:instructor_dashboard' %}';
+      }
+    })()"
+  >
+    ← Back
+  </button>
+
+  <noscript>
+    <a href="{% url 'courses:instructor_dashboard' %}"
+       class="inline-block ml-2 text-blue-600 hover:text-blue-800 underline">
+      Back
+    </a>
+  </noscript>
+</div>
+
 
   <table class="min-w-full border">
     <thead class="bg-gray-50">

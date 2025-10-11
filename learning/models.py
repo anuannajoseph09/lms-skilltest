@@ -1,6 +1,7 @@
 from django.db import models
 from courses.models import Course
 from django.utils import timezone
+from django.conf import settings 
 
 class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons")
@@ -28,3 +29,20 @@ class LiveSession(models.Model):
     def is_active(self):
         now = timezone.now()
         return self.start_time <= now <= self.end_time
+
+
+class LessonProgress(models.Model):
+    """Marks a single student's completion for a lesson."""
+    user   = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="lesson_progress")
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="progress_marks")
+    is_completed = models.BooleanField(default=True)  # simple flag
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("user", "lesson")
+        indexes = [models.Index(fields=["user", "lesson"])]
+
+    def save(self, *args, **kwargs):
+        if self.is_completed and not self.completed_at:
+            self.completed_at = timezone.now()
+        super().save(*args, **kwargs)

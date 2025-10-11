@@ -24,6 +24,31 @@
     {% endif %}
 
     <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Users</h2>
+    <div class="mb-4">
+  <button
+    type="button"
+    class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white shadow hover:shadow-md text-gray-700"
+    onclick="(function(){
+      try {
+        var r = document.referrer;
+        if (r && new URL(r).origin === location.origin) { history.back(); }
+        else { location.href = '{% url 'adminpanel:ap_dashboard' %}'; }
+      } catch(e) {
+        location.href = '{% url 'adminpanel:ap_dashboard' %}';
+      }
+    })()"
+  >
+    ← Back
+  </button>
+
+  <noscript>
+    <a href="{% url 'adminpanel:ap_dashboard' %}"
+       class="inline-block ml-2 text-blue-600 hover:text-blue-800 underline">
+      Back
+    </a>
+  </noscript>
+</div>
+   
 
     <!-- Filter -->
     <form method="get" class="mb-8 flex justify-center gap-2">
@@ -47,9 +72,9 @@
     </form>
 
     <p class="text-center mb-6">
-      <a href="{% url 'ap_create_student' %}" class="text-blue-600 hover:text-blue-800 font-medium">+ Add Student</a>
+      <a href="{% url 'adminpanel:ap_create_student' %}" class="text-blue-600 hover:text-blue-800 font-medium">+ Add Student</a>
       <span class="text-gray-400 mx-2">|</span>
-      <a href="{% url 'ap_create_instructor' %}" class="text-blue-600 hover:text-blue-800 font-medium">+ Add Instructor</a>
+      <a href="{% url 'adminpanel:ap_create_instructor' %}" class="text-blue-600 hover:text-blue-800 font-medium">+ Add Instructor</a>
     </p>
 
     <!-- Table -->
@@ -83,23 +108,23 @@
               <!-- Role-specific links -->
               {% if u.role == 'instructor' %}
                 {% if not u.is_instructor_approved %}
-                  <a href="{% url 'ap_approve_instructor' u.id %}" class="text-green-600 hover:text-green-800">Approve</a>
+                  <a href="{% url 'adminpanel:ap_approve_instructor' u.id %}" class="text-green-600 hover:text-green-800">Approve</a>
                   <span class="text-gray-300">•</span>
-                  <a href="{% url 'ap_reject_instructor'  u.id %}" class="text-red-600 hover:text-red-800">Reject</a>
+                  <a href="{% url 'adminpanel:ap_reject_instructor'  u.id %}" class="text-red-600 hover:text-red-800">Reject</a>
                   <span class="text-gray-300">•</span>
                 {% endif %}
               {% else %}
                 <!-- show Make Instructor for non-instructors -->
-                <a href="{% url 'ap_approve_instructor' u.id %}" class="text-green-600 hover:text-green-800">Make Instructor</a>
+                <a href="{% url 'adminpanel:ap_approve_instructor' u.id %}" class="text-green-600 hover:text-green-800">Make Instructor</a>
                 <span class="text-gray-300">•</span>
               {% endif %}
 
               <!-- Common links -->
-              <a href="{% url 'ap_user_edit' u.id %}" class="text-blue-600 hover:text-blue-800">Edit</a>
+              <a href="{% url 'adminpanel:ap_user_edit' u.id %}" class="text-blue-600 hover:text-blue-800">Edit</a>
               <span class="text-gray-300">•</span>
-              <a href="{% url 'ap_reset_password' u.id %}" class="text-blue-600 hover:text-blue-800">Reset PW</a>
+              <a href="{% url 'adminpanel:ap_reset_password' u.id %}" class="text-blue-600 hover:text-blue-800">Reset PW</a>
               <span class="text-gray-300">•</span>
-              <a href="{% url 'ap_user_delete' u.id %}" class="text-red-600 hover:text-red-800">Delete</a>
+              <a href="{% url 'adminpanel:ap_user_delete' u.id %}" class="text-red-600 hover:text-red-800">Delete</a>
             </td>
           </tr>
           {% empty %}

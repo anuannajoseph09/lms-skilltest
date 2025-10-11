@@ -52,16 +52,29 @@
             📝 My Quizzes
           </a>
         </li>
+        
         <li>
-          <a href="" class="block text-gray-700 hover:text-[#068DAA]">
-            💬 Discussion Forum
-          </a>
-        </li>
-        <li>
-          <a href="{% url 'accounts:student_profile_edit' %}" class="block text-gray-700 hover:text-[#068DAA]">
-            👤 Edit Profile
-          </a>
-        </li>
+  {% if enrollments %}
+    <details>
+      <summary class="cursor-pointer text-gray-700 hover:text-[#068DAA]">💬 Discussion Forum</summary>
+      <ul class="mt-2 ml-4 space-y-1">
+        {% for e in enrollments|slice:":5" %}
+          <li>
+            <a href="{% url 'forum:thread_list' e.course.id %}" class="text-sm text-[#068DAA] hover:underline">
+              {{ e.course.title }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% else %}
+    <a href="{% url 'courses:catalog' %}" class="block text-gray-700 hover:text-[#068DAA]">
+      💬 Discussion Forum
+    </a>
+  {% endif %}
+</li>
+
+    
       </ul>
     </aside>
 
@@ -135,6 +148,42 @@
           </div>
         {% endif %}
       </section>
+<!-- Live Classes -->
+<section class="mb-10">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-xl font-semibold">Upcoming Live Classes</h3>
+    {% if enrollments %}
+      <!-- Quick link to first course's full live list (optional) -->
+      <a href="{% url 'learning:live_list' enrollments.0.course.id %}"
+         class="text-sm text-[#068DAA] underline">See all</a>
+    {% endif %}
+  </div>
+
+  {% if upcoming_live %}
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for s in upcoming_live %}
+        <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition">
+          <h4 class="font-bold text-lg mb-1">{{ s.title }}</h4>
+          <p class="text-sm text-gray-600 mb-1">{{ s.course.title }}</p>
+          <p class="text-xs text-gray-500 mb-3">
+            {{ s.start_time|date:"M d, Y H:i" }} – {{ s.end_time|date:"H:i" }}
+          </p>
+
+          {% if s.meet_link %}
+            <a href="{{ s.meet_link }}" target="_blank" rel="noopener"
+               class="inline-block bg-[#068DAA] text-white px-4 py-2 rounded-md hover:bg-[#055b70] text-sm font-medium">
+              Join Live
+            </a>
+          {% else %}
+            <span class="text-xs text-gray-500">Meeting link not set</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-600 text-center">No upcoming live classes.</p>
+  {% endif %}
+</section>
 
       <!-- Quizzes -->
       <section class="mb-10">
@@ -168,27 +217,56 @@
       </section>
 
       <!-- Discussion Forum -->
-      <section>
-        <h3 class="text-xl font-semibold mb-4">Discussion Forum</h3>
-        <div class="bg-white p-6 rounded-lg shadow space-y-4">
-          <div class="border-b pb-3">
-            <p class="font-semibold">Q: How to fix import errors in Django?</p>
-            <p class="text-gray-600 text-sm mt-1">Asked by <span class="font-medium">Rahul</span> • 2h ago</p>
-            <p class="mt-2 text-gray-800">
-              You can use <code>pip install</code> or check your virtual environment path.
-            </p>
+{# templates/student/dashboard/index.html — inside <main> … #}
+<section>
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-xl font-semibold">Discussion Forum</h3>
+    {% if enrollments %}
+      <a href="{% url 'forum:thread_create' enrollments.0.course.id %}"
+         class="text-sm bg-[#068DAA] text-white px-3 py-1 rounded hover:bg-[#055b70]">
+        New Thread
+      </a>
+    {% endif %}
+  </div>
+
+  {% if recent_threads %}
+    <div class="bg-white p-6 rounded-lg shadow divide-y">
+      {% for t in recent_threads %}
+        <div class="py-3">
+          <div class="flex items-center justify-between">
+            <a href="{% url 'forum:thread_detail' t.id %}"
+               class="font-semibold text-[#068DAA] hover:underline">
+              {{ t.title }}
+            </a>
+            <span class="text-xs text-gray-500">
+              {{ t.created_at|date:"M d, Y H:i" }}
+            </span>
           </div>
-          <div>
-            <textarea
-              class="w-full border rounded-lg p-2 text-sm"
-              placeholder="Ask a question or reply..."
-            ></textarea>
-            <button class="bg-[#068DAA] text-white px-4 py-2 rounded-md mt-2 hover:bg-[#055b70]">
-              Post
-            </button>
-          </div>
+          <p class="text-sm text-gray-600 mt-1">
+            In <a href="{% url 'forum:thread_list' t.course.id %}" class="underline">{{ t.course.title }}</a>
+            • by {{ t.author.username }}
+            • {{ t.reply_count }} repl{{ t.reply_count|pluralize:"y,ies" }}
+          </p>
         </div>
-      </section>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-white p-6 rounded-lg shadow">
+      <p class="text-gray-600">No discussion yet.</p>
+      {% if enrollments %}
+        <a href="{% url 'forum:thread_create' enrollments.0.course.id %}" class="text-[#068DAA] underline">
+          Start the first thread
+        </a>
+      {% else %}
+        <a href="{% url 'courses:catalog' %}" class="text-[#068DAA] underline">
+          Enroll in a course to join its forum
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+
+
     </main>
   </div>
 

@@ -10,17 +10,77 @@
 <body class="bg-gray-100 font-sans">
   <div class="container mx-auto px-6 py-10">
 
-    <!-- Header -->
+    <!-- Header + Shortcuts -->
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-      <a href="{% url 'ap_user_list' %}" 
-         class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-         Manage Users
-      </a>
+      <div class="flex gap-2">
+        <a href="{% url 'adminpanel:ap_user_list' %}" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700">Users</a>
+        <a href="{% url 'adminpanel:ap_course_list' %}" class="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700">Courses</a>
+        <a href="{% url 'adminpanel:ap_contents' %}" class="bg-teal-600 text-white px-3 py-2 rounded-lg hover:bg-teal-700">Contents</a>
+      </div>
+    </div>
+
+    <!-- Control Center (Everything in one place) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+      <!-- 1) User Management -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold text-gray-800 mb-3">User Management</h2>
+        <p class="text-gray-500 mb-4">Manage students and instructors.</p>
+        <div class="flex flex-wrap gap-2">
+          <a href="{% url 'adminpanel:ap_user_list' %}?role=student" class="px-3 py-2 border rounded hover:bg-gray-50">View Students</a>
+          <a href="{% url 'adminpanel:ap_user_list' %}?role=instructor" class="px-3 py-2 border rounded hover:bg-gray-50">View Instructors</a>
+          <a href="{% url 'adminpanel:ap_create_student' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Add Student</a>
+          <a href="{% url 'adminpanel:ap_create_instructor' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Add Instructor</a>
+          <!-- Approve/reject happens from the Users list row actions -->
+          <a href="{% url 'adminpanel:ap_user_list' %}?role=instructor" class="px-3 py-2 border rounded hover:bg-gray-50">Approve/Reject Instructors</a>
+          <a href="{% url 'adminpanel:ap_user_list' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Edit/Delete/Reset Passwords</a>
+        </div>
+      </div>
+
+      <!-- 2) Course Oversight -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold text-gray-800 mb-3">Course Oversight</h2>
+        <p class="text-gray-500 mb-4">Review and moderate courses & categories.</p>
+        <div class="flex flex-wrap gap-2">
+          <a href="{% url 'adminpanel:ap_course_list' %}" class="px-3 py-2 border rounded hover:bg-gray-50">View All Courses</a>
+          <!-- Toggle active / Delete are actions on the Course list rows -->
+          <a href="{% url 'adminpanel:ap_course_list' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Deactivate / Delete Courses</a>
+          <a href="{% url 'adminpanel:ap_category_list' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Manage Categories</a>
+          <a href="{% url 'adminpanel:ap_category_create' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Add Category</a>
+        </div>
+      </div>
+
+      <!-- 3) Content Management -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold text-gray-800 mb-3">Content Management</h2>
+        <p class="text-gray-500 mb-4">Monitor materials, quizzes, and forum threads.</p>
+        <div class="flex flex-wrap gap-2">
+          <a href="{% url 'adminpanel:ap_contents' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Open Contents Overview</a>
+          <!-- Delete / Toggle actions live on the overview tables -->
+          <a href="{% url 'adminpanel:ap_contents' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Remove Materials/Threads</a>
+          <a href="{% url 'adminpanel:ap_contents' %}" class="px-3 py-2 border rounded hover:bg-gray-50">Toggle/Delete Quizzes</a>
+        </div>
+      </div>
+
+      <!-- 4) Analytics -->
+      <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold text-gray-800 mb-3">Analytics</h2>
+        <p class="text-gray-500 mb-4">At-a-glance metrics and leaderboards.</p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="border rounded p-3">
+            <div class="text-xs text-gray-500 uppercase">New Users (7d)</div>
+            <div class="text-2xl font-bold">{{ stats.new_users_7d|default:"0" }}</div>
+          </div>
+          <div class="border rounded p-3">
+            <div class="text-xs text-gray-500 uppercase">New Courses (7d)</div>
+            <div class="text-2xl font-bold">{{ stats.new_courses_7d|default:"0" }}</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition">
         <h3 class="text-gray-500 text-sm uppercase mb-2">Total Users</h3>
         <p class="text-3xl font-bold text-gray-800">{{ stats.total_users }}</p>
@@ -76,7 +136,12 @@
 
     <!-- Top Performing Students -->
     <div class="bg-white p-6 rounded-lg shadow">
-      <h2 class="text-2xl font-semibold text-gray-800 mb-4">Top Performing Students</h2>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+        Top Performing Students
+        <span class="text-sm text-gray-500">
+          {% if stats.total_quizzes|default:0 > 0 %}(by quiz avg){% else %}(by activity){% endif %}
+        </span>
+      </h2>
       {% if top_students %}
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -90,14 +155,16 @@
             {% for s in top_students %}
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-3 text-gray-800">{{ s.user__username }}</td>
-              <td class="px-6 py-3 text-gray-800 font-semibold">{{ s.avg_score|floatformat:2 }}</td>
+              <td class="px-6 py-3 text-gray-800 font-semibold">
+                {% if s.avg_score %}{{ s.avg_score|floatformat:2 }}{% else %}—{% endif %}
+              </td>
               <td class="px-6 py-3 text-gray-600">{{ s.attempts }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
       {% else %}
-        <p class="text-gray-500">No quiz performance data available.</p>
+        <p class="text-gray-500">No performance data available.</p>
       {% endif %}
     </div>
 

@@ -37,7 +37,7 @@
         padding:25px;
       }
       .logout-btn {
-        color:#f8d7da !important;
+        color:black !important;
       }
       .logout-btn:hover {
         background:#b52d3a;
@@ -51,8 +51,8 @@
       <h4 class="text-white mb-4">Instructor</h4>
 
       <!-- Dashboard -->
-      <a href="{% url 'courses:instructor-dashboard' %}"
-         class="{% if request.resolver_match.url_name == 'instructor-dashboard' %}active{% endif %}">
+      <a href="{% url 'courses:instructor_dashboard' %}"
+         class="{% if request.resolver_match.url_name == 'instructor_dashboard' %}active{% endif %}">
          🏠 Dashboard
       </a>
 
@@ -73,9 +73,13 @@
          class="{% if request.resolver_match.url_name == 'instructor_profile' %}active{% endif %}">
          👤 Profile
       </a>
+           
 
       <!-- Logout -->
-      <a href="{% url 'accounts:logout' %}" class="logout-btn">🚪 Logout</a>
+ <form method="post" action="{% url 'accounts:logout' %}" class="inline">
+  {% csrf_token %}
+  <button type="submit" class="logout-btn">🚪 Logout</button>
+</form>
     </div>
 
     <!-- Main Content -->
